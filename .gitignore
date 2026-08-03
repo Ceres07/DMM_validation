@@ -1,0 +1,25 @@
+.DS_Store
+._*
+.Rhistory
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Generated validation outputs and bulky geospatial/model artifacts.
+outputs/
+data/
+*.tif
+*.tiff
+*.nc
+*.grib
+*.joblib
+*.pkl
+*.parquet
+
+# Secrets/configs.
+.env
+weatherlink_config.json

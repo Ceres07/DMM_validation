@@ -1,0 +1,2 @@
+model_a,model_b,n_matched,mean_delta_abs_error,mean_delta_abs_error_ci95_low,mean_delta_abs_error_ci95_high,median_delta_abs_error,mean_delta_sq_error,rmse_a,rmse_b,rmse_delta_a_minus_b,bias_a,bias_b,bias_delta_a_minus_b,fraction_model_a_better_abs_error
+model6_rf,model8_process,560,0.010433486189161074,-0.4081765373160261,0.46654249894576255,-0.19449377059936523,0.333329638134692,6.477300009868063,6.451518098843258,0.025781911024805204,-0.5578494000434876,2.6454935060228624,-3.2033429060663496,0.5160714285714286

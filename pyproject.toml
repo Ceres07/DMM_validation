@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dmm-validation"
+version = "0.1.0"
+description = "Model-agnostic dense-point validation for downscaled soil moisture models"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "pandas",
+  "matplotlib",
+]
+
+[project.scripts]
+dmm-validate-dense = "dmm_validation.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

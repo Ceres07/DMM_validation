@@ -1,0 +1,16 @@
+{
+  "git_branch": "EMT",
+  "repo_root": "/Volumes/Dmitry_work/borevitz_projects/DownscalingMoistureModel",
+  "validation_dir": "/Volumes/Dmitry_work/borevitz_projects/Data/soilmoisture_points_validation",
+  "input_csv": "/Volumes/Dmitry_work/borevitz_projects/Data/soilmoisture_points_coordinates.csv",
+  "output_dir": "/Volumes/Dmitry_work/borevitz_projects/model6_dense_validation_spiking",
+  "bbox_wsen_epsg4326": [
+    148.918295896476,
+    -35.1080999769417,
+    148.94778389903502,
+    -35.0847946096183
+  ],
+  "template_tif": "/Volumes/Dmitry_work/borevitz_projects/Data/soilmoisture_points_validation/tifs/soil_moisture_2025-04-30.tif",
+  "random_repeats": 10,
+  "seed": 42
+}
