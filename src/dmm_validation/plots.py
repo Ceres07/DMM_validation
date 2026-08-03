@@ -23,6 +23,14 @@ def _models(df: pd.DataFrame) -> list[str]:
     return sorted(df["model_name"].dropna().unique())
 
 
+def _boxplot(ax, data, *, labels: list[str], **kwargs):
+    """Matplotlib-compatible boxplot labels across old/new APIs."""
+    try:
+        return ax.boxplot(data, tick_labels=labels, **kwargs)
+    except TypeError:
+        return ax.boxplot(data, labels=labels, **kwargs)
+
+
 def scatter_by_season(df: pd.DataFrame, out_path: Path) -> None:
     plt = _setup()
     seasons = [s for s in ["spring", "summer", "autumn", "winter"] if s in set(df["season"].astype(str))]
@@ -111,7 +119,7 @@ def seasonal_bias_boxplot(df: pd.DataFrame, out_path: Path) -> None:
             pos += 1
         pos += 0.6
     ax.axhline(0, color="0.25", linewidth=0.9)
-    ax.boxplot(data, positions=positions, labels=labels, showfliers=False)
+    _boxplot(ax, data, positions=positions, labels=labels, showfliers=False)
     ax.set_ylabel("Residual: prediction - observation (%)")
     ax.tick_params(axis="x", labelrotation=45)
     fig.tight_layout()
@@ -185,7 +193,7 @@ def terrain_residual_boxplots(df: pd.DataFrame, terrain_metadata: list[dict], fi
                 labels.append(str(label))
             if groups:
                 ax.axhline(0, color="0.25", linewidth=0.9)
-                ax.boxplot(groups, labels=labels, showfliers=False)
+                _boxplot(ax, groups, labels=labels, showfliers=False)
             ax.set_ylabel(model)
         axes[-1, 0].set_xlabel(f"{var} stratum")
         fig.suptitle(f"Residuals by {var} stratum")

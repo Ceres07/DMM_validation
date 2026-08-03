@@ -14,9 +14,14 @@ dependencies = [
   "matplotlib",
 ]
 
+[project.optional-dependencies]
+tarrawarra = [
+  "pyproj",
+  "rasterio",
+]
+
 [project.scripts]
 dmm-validate-dense = "dmm_validation.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
