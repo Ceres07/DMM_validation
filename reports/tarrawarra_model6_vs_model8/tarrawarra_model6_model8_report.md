@@ -25,7 +25,7 @@ Points: 3610
 
 Dates: 1995-09-25 to 1996-11-29
 
-![Coarse SMIPS beside model6 and model8 untrained outputs](reports/tarrawarra_model6_vs_model8/figures/tarra)
+![Coarse SMIPS beside model6 and model8 untrained outputs](reports/tarrawarra_model6_vs_model8/figures/tarrawarra_coarse_model6_model8_gallery_5m_dem_bounds.png)
 
 ## Overall skill
 

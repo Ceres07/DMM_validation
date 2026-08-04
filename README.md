@@ -32,6 +32,8 @@ Murrumbidgee catchment and predictions elsewhere are plausible but unvalidated.
 Treat this as an independent transfer diagnostic, not a locally calibrated
 score.
 
+![Coarse SMIPS beside model6 and model8 untrained outputs](reports/model6_vs_model8_dense/figures/dense_coarse_model6_model8_gallery.png)
+
 ## Overall skill
 
 | model | n | NSE/R² | Pearson r | RMSE | ubRMSE | bias | MAE |
