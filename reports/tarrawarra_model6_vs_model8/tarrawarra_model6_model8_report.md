@@ -1,38 +1,16 @@
-## Key figures
+Date run: 2026-08-03  
+Model branch used for model8: `DownscalingMoistureModel/process-model/model8` 
 
-### Observed vs predicted by season
+Model version 2026-08-03
 
-![Observed vs predicted by season](figures/scatter_observed_vs_predicted_by_season.png)
+Model branch used for model6: `DownscalingMoistureModel/EMT/model6` 
 
-### Mean observed vs predicted time series
+Model version 2026-08-03
 
-![Mean observed vs predicted time series](figures/timeseries_observed_vs_predicted_mean.png)
+Dense point source: Western, A. W. & Grayson, R. B. (1998). The Tarrawarra data set: Soil moisture patterns, soil characteristics, and hydrological flux measurements. Water Resources Research, 34 (10), pp.2765-2768. https://doi.org/10.1029/98WR01833.
 
-### Mean residual time series
 
-![Mean residual time series](figures/timeseries_residuals_mean.png)
-
-### Seasonal bias
-
-![Seasonal bias](figures/seasonal_bias_boxplot.png)
-
-### Paired point-level model difference
-
-Negative values mean model6 has lower absolute error; positive values mean model8 has lower absolute error.
-
-![Paired model error difference](figures/paired_error_difference_map_model6_rf_minus_model8_process.png)
-
-### Point-level RMSE maps
-
-![Model6 point RMSE](figures/point_map_model6_rf_rmse.png)
-
-![Model8 point RMSE](figures/point_map_model8_process_rmse.png)
-
-### Point-level bias maps
-
-![Model6 point bias](figures/point_map_model6_rf_bias.png)
-
-![Model8 point bias](figures/point_map_model8_process_bias.png)# Independent dense-point validation report
+# Independent dense-point validation report
 
 Input prediction table:
 
@@ -40,11 +18,14 @@ Input prediction table:
 
 Validation rows: 17290
 
-Models: model6_rf, model8_process
+- `model6_rf`: the random-forest/downscaling model;
+- `model8_process`: the process-model branch model8 bucket/readout model.
 
 Points: 3610
 
 Dates: 1995-09-25 to 1996-11-29
+
+![Coarse SMIPS beside model6 and model8 untrained outputs](reports/tarrawarra_model6_vs_model8/figures/tarra)
 
 ## Overall skill
 
@@ -161,16 +142,41 @@ occur; they are not assumed to be inputs used by any model.
 
 _Showing first 30 of 108 rows._
 
-## Figures
+## Key figures
 
-See the `figures/` folder for:
+### Observed vs predicted by season
 
-- observed-vs-predicted scatter by season;
-- mean observed/predicted time series;
-- residual time series;
-- seasonal bias boxplots;
-- point-level maps of RMSE, bias and NSE/R²;
-- paired RF-vs-process error-difference maps when two or more models are present.
+![Observed vs predicted by season](figures/scatter_observed_vs_predicted_by_season.png)
+
+### Mean observed vs predicted time series
+
+![Mean observed vs predicted time series](figures/timeseries_observed_vs_predicted_mean.png)
+
+### Mean residual time series
+
+![Mean residual time series](figures/timeseries_residuals_mean.png)
+
+### Seasonal bias
+
+![Seasonal bias](figures/seasonal_bias_boxplot.png)
+
+### Paired point-level model difference
+
+Negative values mean model6 has lower absolute error; positive values mean model8 has lower absolute error.
+
+![Paired model error difference](figures/paired_error_difference_map_model6_rf_minus_model8_process.png)
+
+### Point-level RMSE maps
+
+![Model6 point RMSE](figures/point_map_model6_rf_rmse.png)
+
+![Model8 point RMSE](figures/point_map_model8_process_rmse.png)
+
+### Point-level bias maps
+
+![Model6 point bias](figures/point_map_model6_rf_bias.png)
+
+![Model8 point bias](figures/point_map_model8_process_bias.png)
 
 ## Interpretation guardrails
 
