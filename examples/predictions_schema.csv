@@ -1,6 +1,0 @@
-model_name,point_id,date,lon,lat,obs_sm_pct,pred_sm_pct,depth_cm,twi,hli,slope,elevation,terrain_zone
-rf_model,p001,2025-09-01,148.9301,-35.1001,18.4,17.9,10,4.2,0.82,7.1,431,ridge
-process_model,p001,2025-09-01,148.9301,-35.1001,18.4,19.1,10,4.2,0.82,7.1,431,ridge
-rf_model,p002,2025-09-01,148.9310,-35.1010,21.2,20.5,10,8.7,0.55,3.2,424,lower_slope
-process_model,p002,2025-09-01,148.9310,-35.1010,21.2,22.3,10,8.7,0.55,3.2,424,lower_slope
-
