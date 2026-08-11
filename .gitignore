@@ -10,6 +10,7 @@ __pycache__/
 venv/
 
 # Generated validation outputs and bulky geospatial/model artifacts.
+legacy/
 outputs/
 data/
 *.tif
@@ -19,6 +20,10 @@ data/
 *.joblib
 *.pkl
 *.parquet
+
+# macOS sidecar/resource-fork files
+._* 
+.DS_Store
 
 # Secrets/configs.
 .env
