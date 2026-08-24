@@ -30,9 +30,10 @@
   {../unified_dense_validation/figures/stage2_local_spiking/}
 }
 
-\newcommand{\nse}{\mathrm{NSE}}
-\newcommand{\ubrmse}{\mathrm{ubRMSE}}
-\newcommand{\vwc}{\mathrm{VWC}}
+\newcommand{\nse}{\ensuremath{\mathrm{NSE}}}
+\newcommand{\ubrmse}{\ensuremath{\mathrm{ubRMSE}}}
+\newcommand{\pearsonr}{\ensuremath{r}}
+\newcommand{\vwc}{\ensuremath{\mathrm{VWC}}}
 \newcommand{\modelSix}{model~6 RF}
 \newcommand{\modelEight}{model~8 process}
 \newcommand{\smips}{\texttt{SMIPS TotalBucket}}
@@ -84,7 +85,10 @@ within-paddock redistribution by terrain, soil and antecedent wetness is
 critical.  Here we use three dense point datasets to test whether the final
 statistical and process-based models developed in the companion paper preserve
 paddock-scale soil-moisture patterns when treated as black-box gridded
-predictors.  \todo{Insert headline metrics and conclusion.}
+predictors.  Skill is summarised using Pearson correlation ($\pearsonr$),
+Nash--Sutcliffe efficiency (\nse{}), RMSE, \ubrmse{} and bias so that temporal
+association, error magnitude and mean-level offsets can be separated.
+\todo{Insert headline values and conclusion.}
 
 \medskip
 \noindent\textbf{Keywords:} soil moisture; dense validation; downscaling;
@@ -94,7 +98,7 @@ paddock scale; model evaluation; local calibration; Nash--Sutcliffe efficiency
 \section{Introduction}\label{sec:intro}
 
 Operational soil-moisture products generally resolve kilometres rather than
-management units, yet irrigation, trafficability, grazing, crop establishment
+management units, yet irrigation, grazing, crop establishment
 and ecophysiological modelling often require information at the scale of a
 paddock or sub-property unit.  The companion paper develops two routes to
 30\,m root-zone soil moisture: a statistical downscaler of the
@@ -126,10 +130,21 @@ This report therefore asks three questions:
   layer improve local prediction while preserving independent validation?
 \end{enumerate}
 
-\todo{Add one paragraph positioning this against comparable dense-field or
-spatial soil-moisture validation studies.  Candidate contrast: most studies
-validate against sparse in-situ stations; fewer evaluate sub-grid spatial
-redistribution with dense campaigns and paired model comparisons.}
+This framing is close in spirit to two lines of previous work but differs in
+its validation emphasis.  Process-oriented downscaling studies such as the
+Equilibrium Moisture from Topography, Vegetation and Soil model
+\citep[EMT+VS;][]{ranney2015emtvs} explicitly use fine-resolution topographic,
+vegetation and soil information to redistribute coarse soil moisture to
+10--100\,m scales, and show that soil and vegetation information can improve
+spatial patterns when those inputs are sufficiently detailed.  Recent
+machine-learning tools such as \texttt{mlhrsm} \citep{peng2024mlhrsm} instead
+emphasise application-ready high-resolution mapping, uncertainty estimation and
+spatial--temporal analysis from in-situ sensors, satellite products and
+land-surface covariates.  The present report sits between these traditions: it
+compares a statistical and a process-based 30\,m product using the same
+model-agnostic dense validation table, and treats seasonal bias, wet/dry
+compression and terrain-stratified error as primary validation targets rather
+than secondary diagnostics.
 
 \section{Relationship to the companion model paper}\label{sec:sister}
 
@@ -174,12 +189,14 @@ calibration needs. \\
 The analysis uses three dense datasets, each contributing a different kind of
 evidence (Table~\ref{tab:site-inventory}).  Esdale provides the strongest
 modern within-site terrain coverage but only autumn--winter dates.  Tarrawarra
-provides unusually dense spatial sampling through a full campaign year, but
-\modelSix{} has a known \smips{}-zero caveat for this historical period and
-should be read partly as a missing-coarse-anchor stress test.  Llara provides
-the strongest seasonal/temporal validation because the profile-mean probe
-record spans multiple years, but its point density is lower and the two
-paddocks should be interpreted separately.
+provides unusually dense spatial sampling through a full campaign year; because
+the raw TDR points are denser than the model grid, Tarrawarra is evaluated
+after aggregation to model grid-cell support.  \modelSix{} also has a known
+\smips{}-zero caveat for this historical period and should be read partly as a
+missing-coarse-anchor stress test.  Llara provides the strongest
+seasonal/temporal validation because the profile-mean probe record spans
+multiple years, but its point density is lower and the two paddocks should be
+interpreted separately.
 
 \begin{table}[htbp]
 \centering
@@ -189,17 +206,17 @@ tables before submission.}
 \label{tab:site-inventory}
 \begin{tabular}{llrrllp{5.1cm}}
 \toprule
-Site & Main role & Points & Dates & Period & Seasons & Interpretation note \\
+Site & Main role & Supports & Dates & Period & Seasons & Interpretation note \\
 \midrule
 Esdale & Spatial/terrain microscope & 79 & 9 & 2025-04-30--2025-07-17
   & Autumn, winter
   & Modern dense campaign; best for terrain residual inference but short
   seasonal coverage. \\
-Tarrawarra & Extreme spatial-density stress test & 3610 & 19
+Tarrawarra & Extreme spatial-density stress test & 178 & 19
   & 1995-09-25--1996-11-29
   & Spring, summer, autumn, winter
-  & Very dense campaign; \modelSix{} is affected by the historical
-  \smips{}-zero caveat. \\
+  & 3610 raw points aggregated to model grid cells by date; \modelSix{} is
+  affected by the historical \smips{}-zero caveat. \\
 Llara & Seasonal/temporal microscope & 32 & 955
   & 2021-10-19--2024-06-30
   & Spring, summer, autumn, winter
@@ -213,24 +230,48 @@ Llara & Seasonal/temporal microscope & 32 & 955
 \includegraphics[width=\textwidth]{dem_points_overlay_gallery.png}
 \caption{Dense validation site terrain context.  Esdale, Llara WE and Llara WW
 use the 30\,m Copernicus/model terrain grid; Tarrawarra uses the converted
-5\,m campaign DEM.  Red points are soil-moisture validation locations.}
+5\,m campaign DEM.  Red points are soil-moisture validation supports: probe
+locations for Esdale and Llara, and aggregated model-grid-cell centroids for
+Tarrawarra.}
 \label{fig:dem-context}
 \end{figure}
 
 \subsection{Observation harmonisation}\label{sec:obs-harmonisation}
 
-\todo{Describe how each dataset's soil-moisture measurements were converted to
-the common target used in the validation table.  Include profile-mean handling
-for Llara, depth handling for Tarrawarra, and the Esdale dense campaign
-measurement convention.  State units explicitly as volumetric water content
-percentage or equivalent.}
+Each dense validation dataset measures soil moisture using methods and depth
+supports that differ from each other and from the training datasets used for
+the original model development.  The validation target is therefore treated as
+volumetric soil moisture percentage at the best available site-specific support,
+not as a perfectly interchangeable sensor quantity.
+
+Llara measurements are obtained from continuously recording in-situ probes that
+measure through a profile to approximately 1.60\,m depth.  The validation uses
+the profile-mean depth from these sensors so that each timestamp contributes a
+single local soil-moisture estimate.  Esdale measurements are handheld TDR
+probe readings to approximately 10\,cm depth.  Tarrawarra measurements are TDR
+probe readings to approximately 15\,cm depth.
+
+Tarrawarra also requires explicit spatial-support harmonisation.  The campaign
+sampling is much denser than the model prediction grid, so scoring raw
+probe observations would over-weight sub-pixel variability that neither a
+30\,m statistical model nor a 30\,m process model can resolve.  For Tarrawarra,
+validation is therefore performed after aggregating observations to the model
+support scale: within each model/date/grid-cell combination, observed TDR soil
+moisture is averaged and the prediction is sampled once from the corresponding
+raster cell.  Residual sub-pixel variation is treated as an
+observational/support mismatch rather than direct model error.  This provides
+an additional diagnostic: grid cells with high within-cell TDR variance mark
+locations where no 30\,m model should be expected to score perfectly unless it
+explicitly represents sub-pixel structure.
 
 \subsection{Model predictions and gridded products}\label{sec:model-products}
 
 For each site and observation date, model predictions are generated or sampled
-from cached gridded products and extracted at the observation coordinates.
+from cached gridded products and extracted at the relevant observation support:
+probe coordinates for Esdale and Llara, and model grid-cell supports for
+Tarrawarra after aggregation.
 The validation protocol is deliberately model agnostic: after prediction,
-each model is represented only by a table of point/date predictions and
+each model is represented only by a table of support/date predictions and
 associated model-input strata.  This allows \modelSix{} and \modelEight{} to be
 compared without relying on either model's internal representation.
 
@@ -245,15 +286,15 @@ or explicitly framed as a coarse-anchor ablation.}
 \subsection{Common prediction table}\label{sec:table-schema}
 
 All validation analyses begin from a common table with one row per
-model--point--date combination:
+model--support--date combination:
 
 \begin{center}
 \begin{tabular}{ll}
 \toprule
 Field group & Required / derived columns \\
 \midrule
-Identity & \texttt{site}, \texttt{model\_name}, \texttt{point\_id},
-\texttt{date} \\
+Identity & \texttt{site}, \texttt{model\_name}, \texttt{point\_id} or
+grid-cell identifier, \texttt{date} \\
 Location & \texttt{lon}, \texttt{lat}, optional projected coordinates \\
 Target and prediction & \texttt{obs\_sm\_pct}, \texttt{pred\_sm\_pct},
 \texttt{residual = pred - obs} \\
@@ -271,6 +312,8 @@ PET and VPD summaries \\
 The metrics match the companion paper so that results are comparable:
 
 \begin{align}
+\pearsonr &= \frac{\sum_i (y_i - \bar{y})(\hat{y}_i - \bar{\hat{y}})}
+  {\sqrt{\sum_i (y_i - \bar{y})^2}\sqrt{\sum_i(\hat{y}_i - \bar{\hat{y}})^2}}, \\
 \nse &= 1 - \frac{\sum_i (y_i - \hat{y}_i)^2}
                {\sum_i (y_i - \bar{y})^2}, \\
 \mathrm{RMSE} &= \sqrt{\frac{1}{n}\sum_i (y_i - \hat{y}_i)^2}, \\
@@ -280,9 +323,11 @@ The metrics match the companion paper so that results are comparable:
 
 Here $y_i$ is observed soil moisture and $\hat{y}_i$ is predicted soil
 moisture.  We report pooled metrics by site and model, seasonal metrics,
-per-point metrics and paired model differences at matched point/date rows.
+per-support metrics and paired model differences at matched support/date rows.
+Pearson $\pearsonr$ measures whether predictions track temporal or spatial
+variation, whereas \nse{} penalises both variance errors and mean-level offsets.
 Where observed variance is low, \nse{} can be unstable or harsh; interpretation
-therefore uses RMSE, \ubrmse{} and bias alongside \nse{}.
+therefore uses Pearson $\pearsonr$, RMSE, \ubrmse{} and bias alongside \nse{}.
 
 \subsection{Blocking and separation of validation from calibration}
 \label{sec:blocking}
@@ -297,7 +342,7 @@ relationship rather than memorising a point or date.
 
 \subsection{Headline site-level skill}\label{sec:stage1-headline}
 
-The first analysis pools all available point/date rows by site and model
+The first analysis pools all available support/date rows by site and model
 (Fig.~\ref{fig:overall-skill}).  This figure should be interpreted as an
 external paddock-scale validation summary, not as a replacement for the OzNet
 cross-validation ladder in the companion paper.
@@ -305,35 +350,63 @@ cross-validation ladder in the companion paper.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{site_model_overall_skill.png}
-\caption{Stage~1 independent dense-point validation: pooled \nse{}, RMSE and
-bias by site and model.  \todo{Update caption with final headline values and
-state which differences are robust under paired comparison.}}
+\caption{Stage~1 independent dense-point validation: pooled \nse{}, Pearson
+$\pearsonr$, RMSE, \ubrmse{} and bias by site and model.  The five metrics are
+reported together because correlation, efficiency, total error magnitude,
+bias-corrected error and mean-level offset answer different validation
+questions.}
 \label{fig:overall-skill}
 \end{figure}
 
-\todo{Populate a compact headline table here with one row per site/model:
-$n$, \nse{}, RMSE, \ubrmse{}, bias, and one short interpretation note.  Keep
-full tables in supplementary CSVs.}
+\begin{table}[htbp]
+\centering
+\small
+\caption{Headline independent validation metrics from the current unified
+analysis cache.  For Tarrawarra, $n$ is the number of model/date/grid-cell
+supports after aggregation, not the number of raw TDR observations.}
+\label{tab:headline-metrics}
+\begin{tabularx}{\textwidth}{llrrrrrX}
+\toprule
+Site & Model & $n$ & \nse{} & $\pearsonr$ & RMSE & \ubrmse{} & Bias / interpretation \\
+\midrule
+Esdale & \modelSix{} & 560 & 0.023 & 0.238 & 6.477 & 6.453
+  & $-0.558$; weak spatial skill, small mean dry bias. \\
+Esdale & \modelEight{} & 560 & 0.031 & 0.462 & 6.452 & 5.884
+  & $2.645$; higher association but wet-biased. \\
+Tarrawarra & \modelSix{} & 2154 & -1.219 & 0.398 & 14.402 & 9.093
+  & $-11.169$; strong dry bias, interpreted with the \smips{}-zero caveat. \\
+Tarrawarra & \modelEight{} & 2154 & 0.077 & 0.853 & 9.291 & 6.958
+  & $-6.157$; strongest Tarrawarra association after support aggregation. \\
+Llara & \modelSix{} & 29247 & 0.036 & 0.267 & 13.927 & 13.744
+  & $-2.249$; slightly better error/bias than \modelEight{} overall. \\
+Llara & \modelEight{} & 29247 & -0.017 & 0.453 & 14.306 & 12.855
+  & $-6.278$; stronger association but larger dry bias. \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{Paired comparison of model6 and model8}\label{sec:stage1-paired}
 
-Because \modelSix{} and \modelEight{} are sampled at the same point/date rows,
-their errors can be compared pairwise.  The paired comparison should report
-mean and median differences in absolute error, RMSE difference, bias difference
-and the fraction of matched observations for which each model has lower
-absolute error.
+Because \modelSix{} and \modelEight{} are sampled at the same support/date rows,
+their residuals can be compared pairwise.  The main paired comparison reports
+RMSE(\modelSix{})--RMSE(\modelEight{}) and
+bias(\modelSix{})--bias(\modelEight{}) on matched supports, with bootstrap
+uncertainty added in the supplement where appropriate.  Positive RMSE
+differences indicate lower RMSE for \modelEight{}; positive bias differences
+indicate that \modelSix{} is wetter, or less dry, than \modelEight{} on the
+same matched rows.
 
 \placeholderbox{Planned paired-comparison figure}{
 Create a compact paired model figure with one row per site.  Suggested panels:
-mean $\Delta |e|$ with bootstrap confidence interval; RMSE(model6) -
-RMSE(model8); fraction of point/date rows where model6 has lower absolute
-error.  Source table:
+RMSE(\modelSix{})--RMSE(\modelEight{}), bias(\modelSix{})--bias(\modelEight{}),
+and optionally bootstrap intervals for these paired residual summaries.  Source
+table:
 \texttt{outputs/unified\_dense\_validation/stage1\_independent\_validation/paired\_model\_comparison\_overall.csv}.}
 
 \subsection{Predicted and observed time series}\label{sec:stage1-timeseries}
 
 Spatially averaged time series provide a diagnostic of seasonal tracking and
-mean-level bias.  They are not a substitute for point-level scoring, but they
+mean-level bias.  They are not a substitute for support-level scoring, but they
 make temporal drift and wet/dry compression visually apparent.
 
 \begin{figure}[htbp]
@@ -397,9 +470,10 @@ variables that are collinear or dynamic strata masquerading as terrain.}
 \label{sec:stage1-spatial}
 
 Prediction-quality maps test whether poor performance is spatially organised.
-For publication, show point-level maps of \nse{}, RMSE and bias, plus a paired
-model-advantage map where useful.  Interpolated quality surfaces can aid visual
-diagnosis but should be labelled as diagnostic interpolation, not model output.
+For publication, show support-level maps of \nse{}, Pearson $\pearsonr$, RMSE,
+\ubrmse{} and bias where sample size permits, plus a paired model-advantage map
+where useful.  Interpolated quality surfaces can aid visual diagnosis but
+should be labelled as diagnostic interpolation, not model output.
 
 \begin{figure}[htbp]
 \centering
@@ -407,10 +481,10 @@ diagnosis but should be labelled as diagnostic interpolation, not model output.
 \includegraphics[width=0.32\textwidth]{tarrawarra_model8_process_rmse_idw_surface.png}
 \includegraphics[width=0.32\textwidth]{tarrawarra_model8_process_bias_idw_surface.png}
 \caption{Example spatial prediction-quality surfaces for Tarrawarra
-\modelEight{}.  These are diagnostic interpolations of point-level validation
-metrics, not gridded model predictions.  \todo{Replace or extend with a final
-multi-site figure that uses consistent colour scales and includes paired
-model-advantage maps.}}
+\modelEight{}.  These are diagnostic interpolations of validation metrics at
+aggregated model-grid-cell support, not gridded model predictions.  \todo{Replace
+or extend with a final multi-site figure that uses consistent colour scales and
+includes paired model-advantage maps.}}
 \label{fig:quality-surfaces}
 \end{figure}
 
@@ -433,8 +507,9 @@ dates and update caption with observed spatial mean moisture.}}
 \centering
 \includegraphics[width=\textwidth]{tarrawarra_coarse_model6_model8_gallery.png}
 \caption{Tarrawarra gridded prediction examples in the 5\,m campaign DEM
-footprint.  \caution{Caption must explicitly state the \modelSix{}
-\smips{}-zero caveat if this figure is retained.}}
+footprint.  Validation scores for this site are computed after aggregating raw
+TDR observations to model-grid-cell support.  \caution{\modelSix{} also has the
+\smips{}-zero caveat for this historical run.}}
 \label{fig:tarrawarra-gridded}
 \end{figure}
 
@@ -571,15 +646,18 @@ that improve model training from data that improve independent validation.}
 coverage.
 \item Llara has strong temporal/seasonal coverage but only 32 probes across
 two paddocks.
-\item Tarrawarra has exceptional point density but the current \modelSix{}
-\smips{}-zero caveat prevents direct interpretation as an operational
-\modelSix{} result.
+\item Tarrawarra has exceptional raw point density; validation now aggregates
+those points to model grid cells by date before scoring. The current
+\modelSix{} \smips{}-zero caveat prevents direct interpretation as an
+operational \modelSix{} result. High within-cell TDR variance should be treated
+as support mismatch unless future models explicitly represent sub-pixel
+structure.
 \item Soil-moisture depth definitions and profile integration differ across
 datasets and must be documented carefully.
 \item Dense datasets remain limited in climate and soil coverage relative to
 the intended national product.
-\item \nse{} can be unstable when observed variance is small; RMSE,
-\ubrmse{} and bias must be interpreted alongside it.
+\item \nse{} can be unstable when observed variance is small; Pearson
+$\pearsonr$, RMSE, \ubrmse{} and bias must be interpreted alongside it.
 \item Local calibration experiments are deployment sensitivity analyses, not
 independent validation of the base models.
 \end{itemize}
@@ -606,13 +684,13 @@ and any restrictions before submission.}
 \item Full model-agnostic prediction tables for Esdale, Tarrawarra and Llara.
 \item Full per-site/model metric tables.
 \item Full terrain/model-input strata tables.
-\item Full paired point/date model comparison tables.
+\item Full paired support/date model comparison tables.
 \item Local calibration design tables, selected calibration points and
   replicate-level learning-curve outputs.
 \item Additional prediction-quality maps and gridded dry/wet map examples.
 \end{itemize}
 
 \bibliographystyle{plainnat}
-\bibliography{../../../DownscalingMoistureModel/paper/references}
+\bibliography{../../../DownscalingMoistureModel/paper/references,references_dense_validation}
 
 \end{document}

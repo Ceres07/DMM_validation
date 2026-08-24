@@ -1,0 +1,34 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Peng et~al.(2024)Peng, Yang, Zhang, and Huang]{peng2024mlhrsm}
+Yuliang Peng, Zhengwei Yang, Zhou Zhang, and Jingyi Huang.
+\newblock A machine learning-based high-resolution soil moisture mapping and
+  spatial--temporal analysis: The mlhrsm package.
+\newblock \emph{Agronomy}, 14\penalty0 (3):\penalty0 421, 2024.
+\newblock \doi{10.3390/agronomy14030421}.
+\newblock URL \url{https://doi.org/10.3390/agronomy14030421}.
+
+\bibitem[Ranney et~al.(2015)Ranney, Niemann, Lehman, Green, and
+  Jones]{ranney2015emtvs}
+Kayla~J. Ranney, Jeffrey~D. Niemann, Brandon~M. Lehman, Timothy~R. Green, and
+  Andrew~S. Jones.
+\newblock A method to downscale soil moisture to fine resolutions using
+  topographic, vegetation, and soil data.
+\newblock \emph{Advances in Water Resources}, 76:\penalty0 81--96, 2015.
+\newblock \doi{10.1016/j.advwatres.2014.12.003}.
+\newblock URL \url{https://doi.org/10.1016/j.advwatres.2014.12.003}.
+
+\bibitem[Smith et~al.(2012)Smith, Walker, Western, Young, Ellett, Pipunic,
+  Grayson, Siriwardena, Chiew, and Richter]{smith2012oznet}
+A.~B. Smith, J.~P. Walker, A.~W. Western, R.~I. Young, K.~M. Ellett, R.~C.
+  Pipunic, R.~B. Grayson, L.~Siriwardena, F.~H.~S. Chiew, and H.~Richter.
+\newblock The {M}urrumbidgee soil moisture monitoring network data set.
+\newblock \emph{Water Resources Research}, 48:\penalty0 W07701, 2012.
+\newblock \doi{10.1029/2012WR011976}.
+
+\end{thebibliography}

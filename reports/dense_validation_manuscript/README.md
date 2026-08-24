@@ -15,6 +15,13 @@ The document currently pulls figures from:
 
 `../unified_dense_validation/figures/`
 
+It uses two BibTeX sources:
+
+- the companion model paper bibliography:
+  `../../../DownscalingMoistureModel/paper/references.bib`
+- local dense-validation additions:
+  `references_dense_validation.bib`
+
 The main analysis tables live under:
 
 `../../outputs/unified_dense_validation/`
