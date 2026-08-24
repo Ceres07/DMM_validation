@@ -359,6 +359,14 @@ _Showing first 70 of 76 rows._
 
 Independent pooled skill for each model/site, before any local calibration.
 
+### Predicted vs observed time series by site
+
+![Predicted vs observed soil-moisture time series across validation sites](figures/stage1/predicted_vs_observed_timeseries_three_sites.png)
+
+Spatial-mean observed soil moisture and spatial-mean model6/model8 predictions
+for Esdale, Tarrawarra and Llara. The companion table is
+`reports/unified_dense_validation/tables/predicted_vs_observed_timeseries_three_sites.csv`.
+
 ### Seasonal bias by site and model
 
 ![Seasonal bias by site and model](figures/stage1/seasonal_bias_by_site_model.png)
@@ -370,6 +378,18 @@ Mean residual by season; positive values mean overprediction.
 ![Dry/wet observed-state bias](figures/stage1/wetness_quantile_bias.png)
 
 Bias in driest and wettest observed moisture quartiles.
+
+### Dense-site DEM context maps
+
+![Dense validation site terrain context](figures/stage1/dem_point_overlays/dem_points_overlay_gallery.png)
+
+True DEM-backed terrain maps with soil-moisture point overlays. Esdale, Llara
+WE and Llara WW use the 30 m Copernicus/model terrain grid; Tarrawarra uses the
+converted 5 m campaign DEM. Individual presentation maps are also available for
+[Esdale](figures/stage1/dem_point_overlays/esdale_dem_points_overlay.png),
+[Tarrawarra](figures/stage1/dem_point_overlays/tarrawarra_dem_points_overlay.png),
+[Llara WE](figures/stage1/dem_point_overlays/llara_we_dem_points_overlay.png),
+and [Llara WW](figures/stage1/dem_point_overlays/llara_ww_dem_points_overlay.png).
 
 ### Esdale raster-native dry/wet prediction gallery
 
