@@ -1,9 +1,18 @@
-\begin{thebibliography}{3}
+\begin{thebibliography}{4}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
   \providecommand{\doi}[1]{doi: #1}\else
   \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Nash and Sutcliffe(1970)]{nash1970river}
+J.~E. Nash and J.~V. Sutcliffe.
+\newblock River flow forecasting through conceptual models part i---a
+  discussion of principles.
+\newblock \emph{Journal of Hydrology}, 10\penalty0 (3):\penalty0 282--290,
+  1970.
+\newblock \doi{10.1016/0022-1694(70)90255-6}.
+\newblock URL \url{https://doi.org/10.1016/0022-1694(70)90255-6}.
 
 \bibitem[Peng et~al.(2024)Peng, Yang, Zhang, and Huang]{peng2024mlhrsm}
 Yuliang Peng, Zhengwei Yang, Zhou Zhang, and Jingyi Huang.

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.8.24)  24 AUG 2026 12:44
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.8.24)  25 AUG 2026 11:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -472,241 +472,239 @@ Package hyperref Info: Link coloring OFF on input line 61.
 
 {/usr/local/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/usr/loc
 al/texlive/2026/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}] [2]
-Overfull \hbox (326.47578pt too wide) in paragraph at lines 207--226
- [][] 
- []
-
 <../unified_dense_validation/figures/stage1/dem_point_overlays/dem_points_overl
-ay_gallery.png, id=165, 895.8195pt x 719.0865pt>
+ay_gallery.png, id=164, 895.8195pt x 719.0865pt>
 File: ../unified_dense_validation/figures/stage1/dem_point_overlays/dem_points_
 overlay_gallery.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/dem_point_overlays/dem_points_o
 verlay_gallery.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/dem_point_o
-verlays/dem_points_overlay_gallery.png  used on input line 230.
+verlays/dem_points_overlay_gallery.png  used on input line 236.
 (pdftex.def)             Requested size: 455.24411pt x 365.42355pt.
-[3] [4 <../unified_dense_validation/figures/stage1/dem_point_overlays/dem_point
-s_overlay_gallery.png>]
-Overfull \hbox (81.01878pt too wide) in paragraph at lines 292--308
- [] 
- []
-
-[5]
+ [3] [4 <../unified_dense_validation/figures/stage1/dem_point_overlays/dem_poin
+ts_overlay_gallery.png>] [5]
+<../unified_dense_validation/figures/stage1/esdale_dry_wet_coarse_model6_model8
+_gallery.png, id=195, 681.3455pt x 448.877pt>
+File: ../unified_dense_validation/figures/stage1/esdale_dry_wet_coarse_model6_m
+odel8_gallery.png Graphic file (type png)
+<use ../unified_dense_validation/figures/stage1/esdale_dry_wet_coarse_model6_mo
+del8_gallery.png>
+Package pdftex.def Info: ../unified_dense_validation/figures/stage1/esdale_dry_
+wet_coarse_model6_model8_gallery.png  used on input line 365.
+(pdftex.def)             Requested size: 455.24411pt x 299.91725pt.
+<../unified_dense_validation/figures/stage1/tarrawarra_dry_wet_coarse_model6_mo
+del8_gallery.png, id=196, 686.9665pt x 425.1885pt>
+File: ../unified_dense_validation/figures/stage1/tarrawarra_dry_wet_coarse_mode
+l6_model8_gallery.png Graphic file (type png)
+<use ../unified_dense_validation/figures/stage1/tarrawarra_dry_wet_coarse_model
+6_model8_gallery.png>
+Package pdftex.def Info: ../unified_dense_validation/figures/stage1/tarrawarra_
+dry_wet_coarse_model6_model8_gallery.png  used on input line 375.
+(pdftex.def)             Requested size: 455.24411pt x 281.77362pt.
 <../unified_dense_validation/figures/stage1/site_model_overall_skill.png, id=19
-2, 1293.2315pt x 301.5265pt>
+8, 1293.2315pt x 301.5265pt>
 File: ../unified_dense_validation/figures/stage1/site_model_overall_skill.png G
 raphic file (type png)
 <use ../unified_dense_validation/figures/stage1/site_model_overall_skill.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/site_model_
-overall_skill.png  used on input line 352.
+overall_skill.png  used on input line 394.
 (pdftex.def)             Requested size: 455.24411pt x 106.14317pt.
-
-Underfull \hbox (badness 1412) in paragraph at lines 385--385
+ [6 <../unified_dense_validation/figures/stage1/esdale_dry_wet_coarse_model6_mo
+del8_gallery.png>] [7 <../unified_dense_validation/figures/stage1/tarrawarra_dr
+y_wet_coarse_model6_model8_gallery.png> <../unified_dense_validation/figures/st
+age1/site_model_overall_skill.png>]
+Underfull \hbox (badness 1412) in paragraph at lines 442--442
 []|$\OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 (+20) 11\OML/cmm/m/it/10 :\OT1/cmr/m/n/
 10 (+20) 169$; strong dry
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 385--385
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
 \OT1/cmr/m/n/10 (+20) bias, in-ter-preted
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 385--385
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
 \OT1/cmr/m/n/10 (+20) with the \OT1/cmtt/m/n/10 SMIPS
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 385--385
+Underfull \hbox (badness 10000) in paragraph at lines 442--442
 \OT1/cmtt/m/n/10 TotalBucket\OT1/cmr/m/n/10 (+20) -zero
  []
 
 
-Underfull \hbox (badness 1881) in paragraph at lines 385--385
+Underfull \hbox (badness 1881) in paragraph at lines 442--442
 \OT1/cmr/m/n/10 (+20) ter sup-port ag-gre-ga-
  []
 
 
-Underfull \hbox (badness 1062) in paragraph at lines 385--385
+Underfull \hbox (badness 1062) in paragraph at lines 442--442
 []|$\OMS/cmsy/m/n/10 ^^@\OT1/cmr/m/n/10 (+20) 2\OML/cmm/m/it/10 :\OT1/cmr/m/n/1
 0 (+20) 249$; slightly bet-
  []
 
 
-Underfull \hbox (badness 7814) in paragraph at lines 385--385
+Underfull \hbox (badness 7814) in paragraph at lines 442--442
 \OT1/cmr/m/n/10 (+20) ter er-ror/bias than
  []
 
 
-Overfull \hbox (134.13675pt too wide) in paragraph at lines 404--404
-\OT1/cmtt/m/n/10.95 outputs/unified[]dense[]validation/stage1[]independent[]val
-idation/paired[]model[]comparison[]overall.csv\OT1/cmr/m/n/10.95 (-20) .
+Underfull \hbox (badness 4454) in paragraph at lines 461--461
+\OT1/cmr/m/n/10.95 (+20) pro-cess), and op-tion-ally boot-strap in-ter-vals for
+ these paired resid-ual sum-
  []
 
+[8]
 <../unified_dense_validation/figures/stage1/predicted_vs_observed_timeseries_th
-ree_sites.png, id=193, 859.21pt x 670.9065pt>
+ree_sites.png, id=220, 859.21pt x 670.9065pt>
 File: ../unified_dense_validation/figures/stage1/predicted_vs_observed_timeseri
 es_three_sites.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/predicted_vs_observed_timeserie
 s_three_sites.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/predicted_v
-s_observed_timeseries_three_sites.png  used on input line 414.
+s_observed_timeseries_three_sites.png  used on input line 471.
 (pdftex.def)             Requested size: 455.24411pt x 355.47636pt.
-[6 <../unified_dense_validation/figures/stage1/site_model_overall_skill.png>]
-[7 <../unified_dense_validation/figures/stage1/predicted_vs_observed_timeseries
-_three_sites.png>]
+ [9 <../unified_dense_validation/figures/stage1/predicted_vs_observed_timeserie
+s_three_sites.png>]
 <../unified_dense_validation/figures/stage1/seasonal_bias_by_site_model.png, id
-=207, 348.502pt x 318.3895pt>
+=228, 348.502pt x 318.3895pt>
 File: ../unified_dense_validation/figures/stage1/seasonal_bias_by_site_model.pn
 g Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/seasonal_bias_by_site_model.png
 >
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/seasonal_bi
-as_by_site_model.png  used on input line 431.
+as_by_site_model.png  used on input line 499.
 (pdftex.def)             Requested size: 418.82375pt x 382.63388pt.
-<../unified_dense_validation/figures/stage1/wetness_quantile_bias.png, id=208, 
+<../unified_dense_validation/figures/stage1/wetness_quantile_bias.png, id=230, 
 715.0715pt x 641.1955pt>
 File: ../unified_dense_validation/figures/stage1/wetness_quantile_bias.png Grap
 hic file (type png)
 <use ../unified_dense_validation/figures/stage1/wetness_quantile_bias.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/wetness_qua
-ntile_bias.png  used on input line 441.
+ntile_bias.png  used on input line 517.
 (pdftex.def)             Requested size: 418.82375pt x 375.55281pt.
- [8] [9 <../unified_dense_validation/figures/stage1/seasonal_bias_by_site_model
-.png>] [10 <../unified_dense_validation/figures/stage1/wetness_quantile_bias.pn
-g>]
+ [10 <../unified_dense_validation/figures/stage1/seasonal_bias_by_site_model.pn
+g>] [11 <../unified_dense_validation/figures/stage1/wetness_quantile_bias.png>]
 <../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_model8_
-process_nse_idw_surface.png, id=226, 437.635pt x 368.9785pt>
+process_nse_idw_surface.png, id=243, 437.635pt x 368.9785pt>
 File: ../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mo
 del8_process_nse_idw_surface.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mod
 el8_process_nse_idw_surface.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/quality_sur
-faces/tarrawarra_model8_process_nse_idw_surface.png  used on input line 480.
+faces/tarrawarra_model8_process_nse_idw_surface.png  used on input line 556.
 (pdftex.def)             Requested size: 145.68144pt x 122.82738pt.
 <../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_model8_
-process_rmse_idw_surface.png, id=227, 430.408pt x 368.9785pt>
+process_rmse_idw_surface.png, id=244, 430.408pt x 368.9785pt>
 File: ../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mo
 del8_process_rmse_idw_surface.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mod
 el8_process_rmse_idw_surface.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/quality_sur
-faces/tarrawarra_model8_process_rmse_idw_surface.png  used on input line 481.
+faces/tarrawarra_model8_process_rmse_idw_surface.png  used on input line 557.
 (pdftex.def)             Requested size: 145.68144pt x 124.88802pt.
 <../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_model8_
-process_bias_idw_surface.png, id=228, 437.635pt x 368.9785pt>
+process_bias_idw_surface.png, id=245, 437.635pt x 368.9785pt>
 File: ../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mo
 del8_process_bias_idw_surface.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mod
 el8_process_bias_idw_surface.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/quality_sur
-faces/tarrawarra_model8_process_bias_idw_surface.png  used on input line 482.
+faces/tarrawarra_model8_process_bias_idw_surface.png  used on input line 558.
 (pdftex.def)             Requested size: 145.68144pt x 122.82738pt.
-<../unified_dense_validation/figures/stage1/esdale_coarse_model6_model8_gallery
-.png, id=229, 642.8015pt x 1280.785pt>
-File: ../unified_dense_validation/figures/stage1/esdale_coarse_model6_model8_ga
-llery.png Graphic file (type png)
-<use ../unified_dense_validation/figures/stage1/esdale_coarse_model6_model8_gal
-lery.png>
-Package pdftex.def Info: ../unified_dense_validation/figures/stage1/esdale_coar
-se_model6_model8_gallery.png  used on input line 499.
-(pdftex.def)             Requested size: 455.24411pt x 907.09671pt.
-
-
-LaTeX Warning: Float too large for page by 257.85114pt on input line 504.
-
-<../unified_dense_validation/figures/stage1/tarrawarra_coarse_model6_model8_gal
-lery.png, id=230, 686.9665pt x 1238.226pt>
-File: ../unified_dense_validation/figures/stage1/tarrawarra_coarse_model6_model
-8_gallery.png Graphic file (type png)
-<use ../unified_dense_validation/figures/stage1/tarrawarra_coarse_model6_model8
-_gallery.png>
-Package pdftex.def Info: ../unified_dense_validation/figures/stage1/tarrawarra_
-coarse_model6_model8_gallery.png  used on input line 508.
-(pdftex.def)             Requested size: 455.24411pt x 820.5759pt.
-
-LaTeX Warning: Float too large for page by 184.93033pt on input line 514.
-
 <../unified_dense_validation/figures/stage1/llara_native_prediction_maps/llara_
-WE_native_prediction_gallery.png, id=231, 528.7755pt x 525.5635pt>
+WE_native_prediction_gallery.png, id=249, 528.7755pt x 525.5635pt>
 File: ../unified_dense_validation/figures/stage1/llara_native_prediction_maps/l
 lara_WE_native_prediction_gallery.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/llara_native_prediction_maps/ll
 ara_WE_native_prediction_gallery.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/llara_nativ
-e_prediction_maps/llara_WE_native_prediction_gallery.png  used on input line 51
-8.
+e_prediction_maps/llara_WE_native_prediction_gallery.png  used on input line 58
+0.
 (pdftex.def)             Requested size: 223.07211pt x 221.71353pt.
 <../unified_dense_validation/figures/stage1/llara_native_prediction_maps/llara_
-WW_native_prediction_gallery.png, id=232, 538.4115pt x 551.661pt>
+WW_native_prediction_gallery.png, id=250, 538.4115pt x 551.661pt>
 File: ../unified_dense_validation/figures/stage1/llara_native_prediction_maps/l
 lara_WW_native_prediction_gallery.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage1/llara_native_prediction_maps/ll
 ara_WW_native_prediction_gallery.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage1/llara_nativ
-e_prediction_maps/llara_WW_native_prediction_gallery.png  used on input line 51
-9.
+e_prediction_maps/llara_WW_native_prediction_gallery.png  used on input line 58
+1.
 (pdftex.def)             Requested size: 223.07211pt x 228.55624pt.
-[11 <../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mod
-el8_process_nse_idw_surface.png> <../unified_dense_validation/figures/stage1/qu
-ality_surfaces/tarrawarra_model8_process_rmse_idw_surface.png> <../unified_dens
-e_validation/figures/stage1/quality_surfaces/tarrawarra_model8_process_bias_idw
-_surface.png>] [12 <../unified_dense_validation/figures/stage1/esdale_coarse_mo
-del6_model8_gallery.png>] [13 <../unified_dense_validation/figures/stage1/tarra
-warra_coarse_model6_model8_gallery.png>]
+ [12 <../unified_dense_validation/figures/stage1/quality_surfaces/tarrawarra_mo
+del8_process_nse_idw_surface.png> <../unified_dense_validation/figures/stage1/q
+uality_surfaces/tarrawarra_model8_process_rmse_idw_surface.png> <../unified_den
+se_validation/figures/stage1/quality_surfaces/tarrawarra_model8_process_bias_id
+w_surface.png>]
 <../unified_dense_validation/figures/stage2_local_spiking/random_spatiotemporal
-_learning_curves_rmse_gain.png, id=258, 686.565pt x 693.792pt>
+_learning_curves_rmse_gain.png, id=261, 686.565pt x 693.792pt>
 File: ../unified_dense_validation/figures/stage2_local_spiking/random_spatiotem
 poral_learning_curves_rmse_gain.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage2_local_spiking/random_spatiotemp
 oral_learning_curves_rmse_gain.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage2_local_spiki
-ng/random_spatiotemporal_learning_curves_rmse_gain.png  used on input line 569.
+ng/random_spatiotemporal_learning_curves_rmse_gain.png  used on input line 640.
 
 (pdftex.def)             Requested size: 455.24411pt x 460.032pt.
-<../unified_dense_validation/figures/stage2_local_spiking/one_sensor_strategy_c
-omparison_rmse_gain.png, id=259, 758.835pt x 672.111pt>
-File: ../unified_dense_validation/figures/stage2_local_spiking/one_sensor_strat
-egy_comparison_rmse_gain.png Graphic file (type png)
-<use ../unified_dense_validation/figures/stage2_local_spiking/one_sensor_strate
-gy_comparison_rmse_gain.png>
+<../unified_dense_validation/figures/stage2_local_spiking/random_spatiotemporal
+_learning_curves_nse.png, id=262, 686.565pt x 693.792pt>
+File: ../unified_dense_validation/figures/stage2_local_spiking/random_spatiotem
+poral_learning_curves_nse.png Graphic file (type png)
+<use ../unified_dense_validation/figures/stage2_local_spiking/random_spatiotemp
+oral_learning_curves_nse.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage2_local_spiki
-ng/one_sensor_strategy_comparison_rmse_gain.png  used on input line 581.
-(pdftex.def)             Requested size: 409.71692pt x 362.89351pt.
+ng/random_spatiotemporal_learning_curves_nse.png  used on input line 648.
+(pdftex.def)             Requested size: 455.24411pt x 460.032pt.
+ [13 <../unified_dense_validation/figures/stage1/llara_native_prediction_maps/l
+lara_WE_native_prediction_gallery.png> <../unified_dense_validation/figures/sta
+ge1/llara_native_prediction_maps/llara_WW_native_prediction_gallery.png>] [14 <
+../unified_dense_validation/figures/stage2_local_spiking/random_spatiotemporal_
+learning_curves_rmse_gain.png>] [15 <../unified_dense_validation/figures/stage2
+_local_spiking/random_spatiotemporal_learning_curves_nse.png>]
+Underfull \hbox (badness 7814) in paragraph at lines 705--705
+[]|\OT1/cmr/m/n/10 (+20) Not reached; best 38 sup-
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 705--705
+[]|\OT1/cmr/m/n/10 (+20) 1 sup-port, land-scape wet/dry
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 705--705
+[]|\OT1/cmr/m/n/10 (+20) 1 sup-port, land-scape wet/dry
+ []
+
 <../unified_dense_validation/figures/stage2_local_spiking/process_vs_statistica
-l_responsiveness_random.png, id=260, 686.565pt x 650.43pt>
+l_responsiveness_random.png, id=289, 686.565pt x 650.43pt>
 File: ../unified_dense_validation/figures/stage2_local_spiking/process_vs_stati
 stical_responsiveness_random.png Graphic file (type png)
 <use ../unified_dense_validation/figures/stage2_local_spiking/process_vs_statis
 tical_responsiveness_random.png>
 Package pdftex.def Info: ../unified_dense_validation/figures/stage2_local_spiki
-ng/process_vs_statistical_responsiveness_random.png  used on input line 602.
+ng/process_vs_statistical_responsiveness_random.png  used on input line 736.
 (pdftex.def)             Requested size: 409.71692pt x 388.14703pt.
- [14 <../unified_dense_validation/figures/stage1/llara_native_prediction_maps/l
-lara_WE_native_prediction_gallery.png> <../unified_dense_validation/figures/sta
-ge1/llara_native_prediction_maps/llara_WW_native_prediction_gallery.png>] [15 <
-../unified_dense_validation/figures/stage2_local_spiking/random_spatiotemporal_
-learning_curves_rmse_gain.png>]
-[16 <../unified_dense_validation/figures/stage2_local_spiking/one_sensor_strate
-gy_comparison_rmse_gain.png>] [17 <../unified_dense_validation/figures/stage2_l
-ocal_spiking/process_vs_statistical_responsiveness_random.png>] [18]
-(./dense_validation_report.bbl) [19] (./dense_validation_report.aux)
+[16] [17 <../unified_dense_validation/figures/stage2_local_spiking/process_vs_s
+tatistical_responsiveness_random.png>] [18] (./dense_validation_report.bbl)
+[19] (./dense_validation_report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-01-19>
  ***********
 Package rerunfilecheck Info: File `dense_validation_report.out' has not changed
 .
-(rerunfilecheck)             Checksum: B46618D8E9939BC793C5BBEA4E056714;6819.
+(rerunfilecheck)             Checksum: D23C8039F2DEA6650FE373FB34EFD944;6832.
  ) 
 Here is how much of TeX's memory you used:
- 13059 strings out of 467525
- 211284 string characters out of 5418982
- 680307 words of memory out of 5000000
- 41579 multiletter control sequences out of 15000+600000
- 642525 words of font info for 161 fonts, out of 8000000 for 9000
+ 13079 strings out of 467525
+ 211675 string characters out of 5418982
+ 681808 words of memory out of 5000000
+ 41584 multiletter control sequences out of 15000+600000
+ 642830 words of font info for 167 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,14n,79p,1020b,560s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,14n,79p,1020b,558s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb>
 </usr/local/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
@@ -723,10 +721,10 @@ e/2026/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive
 /2026/texmf-dist/fonts/type1/public/cm-super/sfrm0600.pfb></usr/local/texlive/2
 026/texmf-dist/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/202
 6/texmf-dist/fonts/type1/public/cm-super/sfrm1095.pfb>
-Output written on dense_validation_report.pdf (19 pages, 3737658 bytes).
+Output written on dense_validation_report.pdf (19 pages, 3371717 bytes).
 PDF statistics:
- 392 PDF objects out of 1000 (max. 8388607)
- 305 compressed objects within 4 object streams
- 84 named destinations out of 1000 (max. 500000)
+ 409 PDF objects out of 1000 (max. 8388607)
+ 322 compressed objects within 4 object streams
+ 87 named destinations out of 1000 (max. 500000)
  40260 words of extra memory for PDF output out of 42996 (max. 10000000)
 

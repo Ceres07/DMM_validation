@@ -204,9 +204,15 @@ interpreted separately.
 current analysis cache and should be checked against the final model-agnostic
 tables before submission.}
 \label{tab:site-inventory}
-\begin{tabular}{llrrllp{5.1cm}}
+\scriptsize
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{1.5cm}
+                              >{\raggedright\arraybackslash}p{2.45cm}
+                              rr
+                              >{\raggedright\arraybackslash}p{2.35cm}
+                              >{\raggedright\arraybackslash}p{1.8cm}
+                              >{\raggedright\arraybackslash}X@{}}
 \toprule
-Site & Main role & Supports & Dates & Period & Seasons & Interpretation note \\
+Site & Main role & Supports & Dates & Period & Seasons & Note \\
 \midrule
 Esdale & Spatial/terrain microscope & 79 & 9 & 2025-04-30--2025-07-17
   & Autumn, winter
@@ -216,13 +222,13 @@ Tarrawarra & Extreme spatial-density stress test & 178 & 19
   & 1995-09-25--1996-11-29
   & Spring, summer, autumn, winter
   & 3610 raw points aggregated to model grid cells by date; \modelSix{} is
-  affected by the historical \smips{}-zero caveat. \\
+  affected by the historical coarse-anchor caveat. \\
 Llara & Seasonal/temporal microscope & 32 & 955
   & 2021-10-19--2024-06-30
   & Spring, summer, autumn, winter
   & Profile-mean probes across WE and WW paddocks; strongest seasonal record. \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 \begin{figure}[htbp]
@@ -288,28 +294,33 @@ or explicitly framed as a coarse-anchor ablation.}
 All validation analyses begin from a common table with one row per
 model--support--date combination:
 
-\begin{center}
-\begin{tabular}{ll}
+\begin{table}[htbp]
+\centering
+\small
+\caption{Model-agnostic prediction-table schema used by all validation steps.}
+\label{tab:prediction-schema}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}
+                              >{\raggedright\arraybackslash}X}
 \toprule
 Field group & Required / derived columns \\
 \midrule
-Identity & \texttt{site}, \texttt{model\_name}, \texttt{point\_id} or
-grid-cell identifier, \texttt{date} \\
-Location & \texttt{lon}, \texttt{lat}, optional projected coordinates \\
-Target and prediction & \texttt{obs\_sm\_pct}, \texttt{pred\_sm\_pct},
-\texttt{residual = pred - obs} \\
+Identity & Site, model name, support identifier (probe or grid cell) and
+sampling date. \\
+Location & Longitude, latitude and optional projected coordinates. \\
+Target and prediction & Observed soil moisture, predicted soil moisture and
+residual, defined as prediction minus observation. \\
 Temporal strata & season, year, date block, wetness state \\
 Static model inputs & elevation, slope, TWI, HLI, accumulation, aspect
 components, SLGA soil properties \\
 Dynamic model inputs & SMIPS summaries where available, antecedent rainfall,
 PET and VPD summaries \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabularx}
+\end{table}
 
 \subsection{Metrics}\label{sec:metrics}
 
-The metrics match the companion paper so that results are comparable:
+Skill is quantified with five complementary metrics:
 
 \begin{align}
 \pearsonr &= \frac{\sum_i (y_i - \bar{y})(\hat{y}_i - \bar{\hat{y}})}
@@ -325,9 +336,10 @@ Here $y_i$ is observed soil moisture and $\hat{y}_i$ is predicted soil
 moisture.  We report pooled metrics by site and model, seasonal metrics,
 per-support metrics and paired model differences at matched support/date rows.
 Pearson $\pearsonr$ measures whether predictions track temporal or spatial
-variation, whereas \nse{} penalises both variance errors and mean-level offsets.
-Where observed variance is low, \nse{} can be unstable or harsh; interpretation
-therefore uses Pearson $\pearsonr$, RMSE, \ubrmse{} and bias alongside \nse{}.
+variation, whereas the Nash--Sutcliffe efficiency \citep[\nse;][]{nash1970river}
+penalises both variance errors and mean-level offsets.  Where observed variance
+is low, \nse{} can be unstable or harsh; interpretation therefore uses Pearson
+$\pearsonr$, RMSE, \ubrmse{} and bias alongside \nse{}.
 
 \subsection{Blocking and separation of validation from calibration}
 \label{sec:blocking}
@@ -339,6 +351,36 @@ estimate because it tests whether calibration learned a transferable local
 relationship rather than memorising a point or date.
 
 \section{Stage 1: independent dense-point validation}\label{sec:stage1}
+
+Before interpreting scalar validation metrics, it is useful to see the gridded
+objects being scored.  Figures~\ref{fig:esdale-dry-wet} and
+\ref{fig:tarrawarra-dry-wet} show the driest and wettest observed campaign dates
+for Esdale and Tarrawarra, respectively, with the coarse estimate, \modelSix{}
+and \modelEight{} shown side by side.  These panels are intended as a visual
+orientation to the map products; all scores below are calculated from matched
+validation supports rather than from visual inspection.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{esdale_dry_wet_coarse_model6_model8_gallery.png}
+\caption{Esdale gridded prediction overview for the observed driest
+(21~May~2025; mean observed soil moisture 7.0\,\%) and wettest
+(11~July~2025; 23.2\,\%) dense-campaign dates.  Columns show the coarse SMIPS
+estimate, \modelSix{} and \modelEight{}.}
+\label{fig:esdale-dry-wet}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{tarrawarra_dry_wet_coarse_model6_model8_gallery.png}
+\caption{Tarrawarra gridded prediction overview for the observed driest
+(23~February~1996; mean observed soil moisture 20.3\,\%) and wettest
+(2~September~1996; 48.4\,\%) campaign dates after aggregation to model-grid
+support.  Columns show the historical coarse estimate, \modelSix{} and
+\modelEight{}.  \caution{The historical \smips{} input is affected by the
+zero-valued coarse-anchor caveat for this run.}}
+\label{fig:tarrawarra-dry-wet}
+\end{figure}
 
 \subsection{Headline site-level skill}\label{sec:stage1-headline}
 
@@ -357,6 +399,21 @@ bias-corrected error and mean-level offset answer different validation
 questions.}
 \label{fig:overall-skill}
 \end{figure}
+
+The headline result is that dense-site transfer remains modest at this scale.
+Across the three sites, pooled \nse{} is near zero for most site/model
+combinations despite positive Pearson correlations, meaning that the models
+often track some spatial or temporal ordering without yet reproducing the full
+observed magnitude and offset.  Esdale has the lowest RMSE, approximately
+6.45--6.48 volumetric percentage points, but only weak-to-moderate Pearson
+correlation ($\pearsonr \approx 0.24$ for \modelSix{} and $0.46$ for
+\modelEight{}).  Error magnitude is larger elsewhere: Llara is approximately
+14 percentage points RMSE for both models, and Tarrawarra ranges from
+9.29 percentage points for \modelEight{} to 14.40 for \modelSix{} after
+support aggregation.  \modelEight{} is therefore the clearer Tarrawarra
+performer in this cache, while the Llara comparison separates association
+(\modelEight{} higher $\pearsonr$) from bias and total error (\modelSix{}
+slightly lower RMSE and smaller dry bias).
 
 \begin{table}[htbp]
 \centering
@@ -401,7 +458,7 @@ Create a compact paired model figure with one row per site.  Suggested panels:
 RMSE(\modelSix{})--RMSE(\modelEight{}), bias(\modelSix{})--bias(\modelEight{}),
 and optionally bootstrap intervals for these paired residual summaries.  Source
 table:
-\texttt{outputs/unified\_dense\_validation/stage1\_independent\_validation/paired\_model\_comparison\_overall.csv}.}
+\nolinkurl{outputs/unified_dense_validation/stage1_independent_validation/paired_model_comparison_overall.csv}.}
 
 \subsection{Predicted and observed time series}\label{sec:stage1-timeseries}
 
@@ -426,6 +483,17 @@ a model can have acceptable pooled error while systematically overpredicting
 dry states or underpredicting wet states.  This is particularly relevant to
 trafficability, drought stress and paddock management decisions.
 
+Seasonal residuals show that mean bias is not stable through time
+(Fig.~\ref{fig:seasonal-bias}).  Esdale is limited to autumn--winter, where
+\modelSix{} changes from a small autumn wet bias to a winter dry bias, while
+\modelEight{} remains wetter than observed in both seasons.  Llara shows the
+clearest multi-year seasonal diagnostic: \modelEight{} has stronger dry bias in
+all seasons, especially spring, whereas \modelSix{} is closer to zero in autumn
+and winter but still dry-biased in spring.  Tarrawarra is dominated by the
+\modelSix{} historical coarse-anchor caveat; \modelSix{} is strongly dry in
+spring, autumn and winter but close to neutral in summer, while \modelEight{}
+is still dry in spring, autumn and winter and wet-biased in summer.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{seasonal_bias_by_site_model.png}
@@ -435,6 +503,14 @@ name the largest seasonal biases and note which site has insufficient seasonal
 coverage.}}
 \label{fig:seasonal-bias}
 \end{figure}
+
+Wetness-state residuals indicate a general compression of the observed
+moisture range (Fig.~\ref{fig:wetness-bias}).  The models tend to overpredict
+the driest observed quartile and underpredict the wettest observed quartile,
+with the effect particularly visible at Llara and Tarrawarra.  This pattern is
+important because a map that gets the mid-range approximately right may still
+misrepresent the very wet and very dry paddock positions that often drive
+management decisions.
 
 \begin{figure}[htbp]
 \centering
@@ -492,26 +568,12 @@ includes paired model-advantage maps.}}
 
 The dense validation ultimately evaluates gridded predictions.  Representative
 dry and wet dates should therefore be shown using actual model rasters rather
-than interpolated point surfaces.
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{esdale_coarse_model6_model8_gallery.png}
-\caption{Esdale gridded prediction examples: coarse estimate, \modelSix{} and
-\modelEight{} for representative dates.  \todo{Verify final selected dry/wet
-dates and update caption with observed spatial mean moisture.}}
-\label{fig:esdale-gridded}
-\end{figure}
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=\textwidth]{tarrawarra_coarse_model6_model8_gallery.png}
-\caption{Tarrawarra gridded prediction examples in the 5\,m campaign DEM
-footprint.  Validation scores for this site are computed after aggregating raw
-TDR observations to model-grid-cell support.  \caution{\modelSix{} also has the
-\smips{}-zero caveat for this historical run.}}
-\label{fig:tarrawarra-gridded}
-\end{figure}
+than interpolated point surfaces.  Esdale and Tarrawarra dry/wet raster
+examples are shown at the start of Section~\ref{sec:stage1}
+(Figs.~\ref{fig:esdale-dry-wet} and \ref{fig:tarrawarra-dry-wet}) so that
+readers see the map products before the scalar validation summaries.  The
+Llara paddocks are shown separately because the two fields have distinct
+terrain footprints and sensor layouts.
 
 \begin{figure}[htbp]
 \centering
@@ -564,27 +626,84 @@ global-prediction extremes, terrain-representative.}
 
 \subsection{Learning curves}\label{sec:stage2-learning}
 
+The learning curves summarise whether sparse local calibration improves
+strictly held-out supports as more local information is supplied.  RMSE gain is
+useful because it has the same units as soil moisture
+(Fig.~\ref{fig:learning-curves-rmse}), but it can hide whether the calibrated
+model becomes efficient relative to the observed variance.  The corresponding
+\nse{} learning curve (Fig.~\ref{fig:learning-curves-nse}) therefore shows
+whether calibration moves the model toward modest but interpretable efficiency
+thresholds such as \nse{} $\approx 0.2$--0.3.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{random_spatiotemporal_learning_curves_rmse_gain.png}
 \caption{Sparse local-calibration learning curves under strict spatial+temporal
-blocking.  Positive values indicate lower RMSE after calibration.  \todo{Update
-caption with the minimum point budget needed to achieve material improvement by
-site and model.}}
-\label{fig:learning-curves}
+blocking.  Positive values indicate lower RMSE after calibration.}
+\label{fig:learning-curves-rmse}
 \end{figure}
-
-\subsection{One-sensor placement strategies}\label{sec:stage2-one-sensor}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{one_sensor_strategy_comparison_rmse_gain.png}
-\caption{One-sensor selection strategy comparison.  This figure addresses the
-deployment question: if only one local point can be instrumented, should it be
-chosen randomly, by landscape knowledge, or by model-informed wet/dry
-extremes?  \todo{Add final inference by site.}}
-\label{fig:one-sensor}
+\includegraphics[width=\textwidth]{random_spatiotemporal_learning_curves_nse.png}
+\caption{Sparse local-calibration learning curves expressed as held-out
+\nse{} under strict spatial+temporal blocking.  Dashed and dotted reference
+lines mark \nse{} = 0.2 and 0.3, respectively.  These thresholds are not
+universal performance targets, but they are useful for asking how much local
+information is needed before calibration becomes meaningfully better than the
+uncalibrated baseline.}
+\label{fig:learning-curves-nse}
 \end{figure}
+
+\subsection{Minimum local information budgets}\label{sec:stage2-minimum-budget}
+
+The deployment question is framed as a minimum information budget: how many
+local supports are needed before strict held-out \nse{} reaches approximately
+0.2 or 0.3?  Table~\ref{tab:min-budget} uses the current strict
+spatial+temporal block and excludes the
+\texttt{field\_knowledge\_wetdry\_proxy} upper-bound strategy because that
+proxy uses observed chronic wet/dry behaviour.  The result is sobering: random
+and simple landscape/model-prior calibration rarely reaches \nse{} = 0.3 in
+this cache, except for Tarrawarra \modelEight{}.  Reaching even \nse{} = 0.2
+generally requires multiple local supports for Esdale and Llara, so the
+practical sensor-placement story should emphasise parsimonious but defensible
+local information budgets rather than assuming a single sensor can identify all
+within-property failure modes.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Minimum local calibration supports needed to reach modest held-out
+\nse{} thresholds under the strict spatial+temporal block.  Entries report the
+smallest non-proxy strategy/method combination reaching the threshold, or the
+best current result if the threshold is not reached.}
+\label{tab:min-budget}
+\begin{tabularx}{\textwidth}{llXX}
+\toprule
+Site & Model & \nse{} $\geq 0.2$ & \nse{} $\geq 0.3$ \\
+\midrule
+Esdale & \modelSix{} &
+Not reached; best 38 supports, global-prediction extremes + residual ridge
+(\nse{} = 0.160). &
+Not reached; same best design (\nse{} = 0.160). \\
+Esdale & \modelEight{} &
+19 supports, landscape wet/dry prior + residual ridge (\nse{} = 0.237). &
+Not reached; best \nse{} = 0.237. \\
+Llara & \modelSix{} &
+16 supports, global-prediction extremes + seasonal offset (\nse{} = 0.205). &
+Not reached; best \nse{} = 0.205. \\
+Llara & \modelEight{} &
+16 supports, global-prediction extremes + affine correction (\nse{} = 0.255). &
+Not reached; best \nse{} = 0.255. \\
+Tarrawarra & \modelSix{} &
+168 supports, global-prediction extremes + residual ridge (\nse{} = 0.263). &
+Not reached; best \nse{} = 0.263. \\
+Tarrawarra & \modelEight{} &
+1 support, landscape wet/dry prior + affine correction (\nse{} = 0.460). &
+1 support, landscape wet/dry prior + affine correction (\nse{} = 0.460). \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsection{Do process and statistical models respond differently?}
 \label{sec:stage2-process-vs-statistical}
@@ -597,14 +716,28 @@ and fewer degrees of freedom, but a local layer may correct its site-level
 state more cleanly.  Dense datasets allow this difference to be measured as
 the marginal gain from the same sparse local information.
 
+In the current strict random-sensor experiment, \modelEight{} generally responds
+better than \modelSix{} at Esdale and Llara, whereas Tarrawarra is more mixed
+(Fig.~\ref{fig:process-response}).  One plausible interpretation is that the
+process model provides a smoother local baseline whose remaining bias can be
+corrected with a small number of local supports, especially where the site is
+outside the station-network distribution but still physically coherent.  At
+Tarrawarra, however, \modelSix{} begins with a large dry bias linked to the
+historical coarse-anchor problem; simple local calibration can remove part of
+that large offset, so the statistical model can show large RMSE gains even when
+\modelEight{} remains the lower-error model after calibration.  A clearer
+mechanistic interpretation will require comparing the calibration supports
+against model-input diagnostics such as TWI, HLI, elevation, soil texture,
+antecedent rainfall/PET and the availability or failure mode of SMIPS/process
+state variables.
+
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.9\textwidth]{process_vs_statistical_responsiveness_random.png}
 \caption{Process-vs-statistical local calibration responsiveness.  Positive
 values indicate that \modelEight{} gained more RMSE improvement than
-\modelSix{} from the same sparse local information budget.  \todo{Confirm
-whether the final figure should use random selection only or the best
-realistic selection strategy per site.}}
+\modelSix{} from the same sparse local information budget under random
+strict-block calibration.}
 \label{fig:process-response}
 \end{figure}
 
@@ -628,9 +761,9 @@ paired evidence is strong and caveats are resolved.}
 \subsection{Implications for local deployment}
 \label{sec:deployment}
 
-\todo{Discuss the one-sensor / few-sensor deployment story.  Frame local
-calibration as a separate adaptation layer placed on top of a national/global
-model, not as leakage into independent validation.}
+\todo{Discuss the sparse-sensor deployment story.  Frame local calibration as a
+separate adaptation layer placed on top of a national/global model, not as
+leakage into independent validation.}
 
 \subsection{Future public training and validation data}
 \label{sec:future-data}
