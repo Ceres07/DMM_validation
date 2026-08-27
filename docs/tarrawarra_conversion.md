@@ -44,7 +44,7 @@ has a larger rotated footprint than the actual point observations.
 ## Example
 
 ```bash
-PYTHONPATH=src python scripts/convert_tarrawarra_ascii.py \
+PYTHONPATH=src python scripts/sites/tarrawarra/convert_tarrawarra_ascii.py \
   --dem-local path/to/tarrawar.dem \
   --tdr-dir path/to/tdr_maps \
   --outdir outputs/tarrawarra_conversion
@@ -57,7 +57,7 @@ repo while pointing it at a checked-out `DownscalingMoistureModel` repo:
 
 ```bash
 /opt/miniconda3/envs/paddockts/bin/python \
-  scripts/run_tarrawarra_model6_model8_comparison.py \
+  scripts/sites/tarrawarra/run_tarrawarra_model6_model8_comparison.py \
   --dmm-repo /Volumes/Dmitry_work/borevitz_projects/DownscalingMoistureModel
 ```
 

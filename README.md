@@ -6,11 +6,16 @@ DownscalingMoistureModel project.
 The current primary output is the unified dense-point validation and local
 spiking report:
 
-[`reports/unified_dense_validation/unified_dense_validation_report.md`](reports/unified_dense_validation/unified_dense_validation_report.md)
+[`reports/analyses/unified_dense_validation/unified_dense_validation_report.md`](reports/analyses/unified_dense_validation/unified_dense_validation_report.md)
 
 The protocol follows the two-stage plan in:
 
 [`docs/Downscaling moisture validation plan.pdf`](docs/Downscaling%20moisture%20validation%20plan.pdf)
+
+Mulloon Rehydration Initiative (MRI) probes are currently kept in a separate
+validation run while the unified dense report remains unchanged:
+
+[`reports/sites/mri_dense_validation/mri_dense_validation_report.md`](reports/sites/mri_dense_validation/mri_dense_validation_report.md)
 
 ## Current protocol
 
@@ -54,25 +59,39 @@ the statistical model.
   columns are available, but full gridded Llara model GeoTIFFs are not currently
   cached.
 
+MRI is staged separately for now. The runner uses
+`/Volumes/Dmitry_work/borevitz_projects/Data/MRI_data/SM_combined_cleaned/SM(%)_combined_cleaned.csv`
+for probe values, `Soil_Moisture_Probes` for labels/coordinates,
+`HT_Measurement_Point_Matrix` for logger serial crosswalks, and records
+`SM_metadata.pdf` as the metadata reference.
+
 ## Re-running
 
 From the repository root:
 
 ```bash
-python scripts/run_unified_dense_validation.py
+python scripts/analyses/unified_dense/run_unified_dense_validation.py
 ```
 
 Useful faster/report-only rerun after Stage 2 already exists:
 
 ```bash
-python scripts/run_unified_dense_validation.py --skip-stage2
+python scripts/analyses/unified_dense/run_unified_dense_validation.py --skip-stage2
+```
+
+Run the separate MRI validation with the PaddockTS-compatible environment:
+
+```bash
+/opt/miniconda3/envs/paddockts/bin/python scripts/sites/mri/run_mri_model6_model8_validation.py
 ```
 
 Main outputs:
 
 - `outputs/unified_dense_validation/stage1_independent_validation/`
 - `outputs/unified_dense_validation/stage2_local_spiking/`
-- `reports/unified_dense_validation/`
+- `reports/analyses/unified_dense_validation/`
+- `outputs/mri_dense_validation/`
+- `reports/sites/mri_dense_validation/`
 
 Generated geospatial/model outputs are intentionally ignored by git; reports,
 figures, scripts and docs are intended to be versioned.
