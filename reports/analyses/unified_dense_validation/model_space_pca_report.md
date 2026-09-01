@@ -4,7 +4,7 @@ This is a separate diagnostic report for the dense validation work. It is design
 
 ## 1. Purpose
 
-The main question is whether the three dense validation sites occupy comparable or distinct parts of the model-agnostic covariate space, and whether model failures occur in the same parts of that space across sites. This matters because a model can have acceptable pooled skill while still failing systematically in particular terrain, soil, exposure, or seasonal-climate contexts.
+The main question is whether the retained validation sites occupy comparable or distinct parts of the model-agnostic covariate space, and whether model failures occur in the same parts of that space across sites. This matters because a model can have acceptable pooled skill while still failing systematically in particular terrain, soil, exposure, or seasonal-climate contexts.
 
 The analysis is framed around four working hypotheses.
 
@@ -17,7 +17,7 @@ The analysis is framed around four working hypotheses.
 
 - Validation predictions: `/Volumes/Dmitry_work/borevitz_projects/DMM_validation/outputs/unified_dense_validation/stage1_independent_validation/combined_model_agnostic_predictions.csv`
 - OzNet training covariate table: `/Volumes/Dmitry_work/borevitz_projects/Data/oznet_model6_training_2006_2010.csv`
-- Validation sites: Esdale, Tarrawarra, and Llara.
+- Validation sites: Esdale, Tarrawarra, Nerrigundah, Llara, MRI.
 - Models compared: model6 statistical RF/HGB and model8 process bucket.
 
 All PCA inputs are model-agnostic covariates already present in the validation prediction table, not covariates from the raw point-measurement CSVs.
@@ -36,7 +36,7 @@ Three related spaces are scaffolded.
 
 For each feature space, features are median-imputed and standardised once across pooled validation supports. PCA is then fitted to the pooled support matrix. This preserves absolute between-site differences. Large separation of site centroids means the sites occupy different parts of covariate space.
 
-Interpretation: this is the right view for asking whether Esdale, Tarrawarra, and Llara are genuinely different environments to the model.
+Interpretation: this is the right view for asking whether the validation sites are genuinely different environments to the model.
 
 ### 4.2 Site-standardised PCA
 
@@ -79,115 +79,161 @@ If both models fail on the same supports, this suggests a shared missing process
 
 | feature_set               | scaling           | PC1    | PC2    |
 | ------------------------- | ----------------- | ------ | ------ |
-| model_agnostic_covariates | global            | 40.226 | 28.094 |
-| model_agnostic_covariates | site_standardised | 18.323 | 13.390 |
-| static_terrain_soil       | global            | 38.462 | 17.463 |
-| static_terrain_soil       | site_standardised | 23.121 | 21.187 |
+| model_agnostic_covariates | global            | 33.254 | 21.227 |
+| model_agnostic_covariates | site_standardised | 21.682 | 11.848 |
+| static_terrain_soil       | global            | 32.401 | 20.178 |
+| static_terrain_soil       | site_standardised | 21.732 | 18.980 |
 
 ### Site centroid distances in validation PCA space
 
-| feature_set               | scaling           | site_a | site_b     | pc1_pc2_distance | pc1_pc2_pc3_distance |
-| ------------------------- | ----------------- | ------ | ---------- | ---------------- | -------------------- |
-| model_agnostic_covariates | global            | Esdale | Llara      | 9.595            | 9.595                |
-| model_agnostic_covariates | global            | Esdale | Tarrawarra | 6.399            | 6.401                |
-| model_agnostic_covariates | global            | Llara  | Tarrawarra | 9.994            | 9.994                |
-| model_agnostic_covariates | site_standardised | Esdale | Llara      | 0.000            | 0.000                |
-| model_agnostic_covariates | site_standardised | Esdale | Tarrawarra | 0.000            | 0.000                |
-| model_agnostic_covariates | site_standardised | Llara  | Tarrawarra | 0.000            | 0.000                |
-| static_terrain_soil       | global            | Esdale | Llara      | 5.419            | 5.446                |
-| static_terrain_soil       | global            | Esdale | Tarrawarra | 3.922            | 4.043                |
-| static_terrain_soil       | global            | Llara  | Tarrawarra | 2.116            | 2.604                |
-| static_terrain_soil       | site_standardised | Esdale | Llara      | 0.000            | 0.000                |
-| static_terrain_soil       | site_standardised | Esdale | Tarrawarra | 0.000            | 0.000                |
-| static_terrain_soil       | site_standardised | Llara  | Tarrawarra | 0.000            | 0.000                |
+| feature_set               | scaling           | site_a      | site_b      | pc1_pc2_distance | pc1_pc2_pc3_distance |
+| ------------------------- | ----------------- | ----------- | ----------- | ---------------- | -------------------- |
+| model_agnostic_covariates | global            | Esdale      | Llara       | 7.998            | 9.461                |
+| model_agnostic_covariates | global            | Esdale      | MRI         | 4.585            | 5.628                |
+| model_agnostic_covariates | global            | Esdale      | Nerrigundah | 6.669            | 6.669                |
+| model_agnostic_covariates | global            | Esdale      | Tarrawarra  | 5.368            | 6.479                |
+| model_agnostic_covariates | global            | Llara       | MRI         | 4.076            | 4.452                |
+| model_agnostic_covariates | global            | Llara       | Nerrigundah | 7.638            | 9.189                |
+| model_agnostic_covariates | global            | Llara       | Tarrawarra  | 9.856            | 9.958                |
+| model_agnostic_covariates | global            | MRI         | Nerrigundah | 7.631            | 8.321                |
+| model_agnostic_covariates | global            | MRI         | Tarrawarra  | 8.363            | 8.371                |
+| model_agnostic_covariates | global            | Nerrigundah | Tarrawarra  | 3.444            | 5.042                |
+| model_agnostic_covariates | site_standardised | Esdale      | Llara       | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Esdale      | MRI         | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Esdale      | Nerrigundah | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Esdale      | Tarrawarra  | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Llara       | MRI         | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Llara       | Nerrigundah | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Llara       | Tarrawarra  | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | MRI         | Nerrigundah | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | MRI         | Tarrawarra  | 0.000            | 0.000                |
+| model_agnostic_covariates | site_standardised | Nerrigundah | Tarrawarra  | 0.000            | 0.000                |
+| static_terrain_soil       | global            | Esdale      | Llara       | 4.827            | 4.971                |
+| static_terrain_soil       | global            | Esdale      | MRI         | 0.426            | 3.357                |
+| static_terrain_soil       | global            | Esdale      | Nerrigundah | 4.900            | 4.925                |
+| static_terrain_soil       | global            | Esdale      | Tarrawarra  | 3.984            | 3.998                |
+| static_terrain_soil       | global            | Llara       | MRI         | 4.839            | 5.292                |
+| static_terrain_soil       | global            | Llara       | Nerrigundah | 3.756            | 3.820                |
+| static_terrain_soil       | global            | Llara       | Tarrawarra  | 1.049            | 1.850                |
+| static_terrain_soil       | global            | MRI         | Nerrigundah | 4.602            | 5.409                |
+| static_terrain_soil       | global            | MRI         | Tarrawarra  | 3.939            | 5.381                |
+| static_terrain_soil       | global            | Nerrigundah | Tarrawarra  | 2.967            | 3.079                |
+| static_terrain_soil       | site_standardised | Esdale      | Llara       | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Esdale      | MRI         | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Esdale      | Nerrigundah | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Esdale      | Tarrawarra  | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Llara       | MRI         | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Llara       | Nerrigundah | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Llara       | Tarrawarra  | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | MRI         | Nerrigundah | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | MRI         | Tarrawarra  | 0.000            | 0.000                |
+| static_terrain_soil       | site_standardised | Nerrigundah | Tarrawarra  | 0.000            | 0.000                |
 
 ### Model failure overlap by site
 
-| site       | n_supports | worst_set_size | shared_worst_supports | jaccard_top20pct_worst_rmse | rmse_correlation_model6_model8 | bias_correlation_model6_model8 | model8_better_fraction |
-| ---------- | ---------- | -------------- | --------------------- | --------------------------- | ------------------------------ | ------------------------------ | ---------------------- |
-| Esdale     | 77.000     | 16.000         | 8.000                 | 0.333                       | 0.476                          | 0.858                          | 0.494                  |
-| Llara      | 32.000     | 7.000          | 5.000                 | 0.556                       | 0.801                          | 0.949                          | 0.531                  |
-| Tarrawarra | 169.000    | 34.000         | 26.000                | 0.619                       | 0.897                          | 0.873                          | 1.000                  |
+| site        | n_supports | worst_set_size | shared_worst_supports | jaccard_top20pct_worst_rmse | rmse_correlation_model6_model8 | bias_correlation_model6_model8 | model8_better_fraction |
+| ----------- | ---------- | -------------- | --------------------- | --------------------------- | ------------------------------ | ------------------------------ | ---------------------- |
+| Esdale      | 77.000     | 16.000         | 8.000                 | 0.333                       | 0.476                          | 0.858                          | 0.494                  |
+| Llara       | 32.000     | 7.000          | 5.000                 | 0.556                       | 0.796                          | 0.950                          | 0.531                  |
+| MRI         | 18.000     | 4.000          | 3.000                 | 0.600                       | 0.986                          | 0.990                          | 0.556                  |
+| Nerrigundah | 128.000    | 26.000         | 14.000                | 0.368                       | 0.525                          | 0.986                          | 0.523                  |
+| Tarrawarra  | 169.000    | 34.000         | 26.000                | 0.619                       | 0.897                          | 0.873                          | 1.000                  |
 
 ### Distance from OzNet training space
 
-| feature_set               | site       | n_validation_rows | n_common_features | median_nn_percentile | p90_nn_percentile | fraction_nn_gt95 | median_mahalanobis_percentile | fraction_mahalanobis_gt95 |
-| ------------------------- | ---------- | ----------------- | ----------------- | -------------------- | ----------------- | ---------------- | ----------------------------- | ------------------------- |
-| static_terrain_soil       | Esdale     | 560.000           | 11.000            | 86.111               | 100.000           | 0.263            | 83.333                        | 0.180                     |
-| static_terrain_soil       | Llara      | 29247.000         | 11.000            | 88.889               | 100.000           | 0.154            | 80.556                        | 0.154                     |
-| static_terrain_soil       | Tarrawarra | 2154.000          | 11.000            | 86.111               | 88.889            | 0.000            | 36.111                        | 0.000                     |
-| model_agnostic_covariates | Esdale     | 560.000           | 25.000            | 100.000              | 100.000           | 1.000            | 62.590                        | 0.070                     |
-| model_agnostic_covariates | Llara      | 29247.000         | 25.000            | 100.000              | 100.000           | 1.000            | 98.311                        | 0.840                     |
-| model_agnostic_covariates | Tarrawarra | 2154.000          | 25.000            | 100.000              | 100.000           | 1.000            | 98.662                        | 0.863                     |
+| feature_set               | site        | n_validation_rows | n_common_features | median_nn_percentile | p90_nn_percentile | fraction_nn_gt95 | median_mahalanobis_percentile | fraction_mahalanobis_gt95 |
+| ------------------------- | ----------- | ----------------- | ----------------- | -------------------- | ----------------- | ---------------- | ----------------------------- | ------------------------- |
+| static_terrain_soil       | Esdale      | 560.000           | 11.000            | 86.111               | 100.000           | 0.263            | 83.333                        | 0.180                     |
+| static_terrain_soil       | Llara       | 28390.000         | 11.000            | 88.889               | 100.000           | 0.155            | 80.556                        | 0.155                     |
+| static_terrain_soil       | MRI         | 29046.000         | 11.000            | 88.889               | 97.222            | 0.121            | 83.333                        | 0.062                     |
+| static_terrain_soil       | Nerrigundah | 1536.000          | 11.000            | 88.889               | 88.889            | 0.000            | 91.667                        | 0.258                     |
+| static_terrain_soil       | Tarrawarra  | 2154.000          | 11.000            | 86.111               | 88.889            | 0.000            | 36.111                        | 0.000                     |
+| model_agnostic_covariates | Esdale      | 560.000           | 25.000            | 100.000              | 100.000           | 1.000            | 62.590                        | 0.070                     |
+| model_agnostic_covariates | Llara       | 28390.000         | 25.000            | 100.000              | 100.000           | 1.000            | 98.318                        | 0.840                     |
+| model_agnostic_covariates | MRI         | 29046.000         | 25.000            | 100.000              | 100.000           | 1.000            | 91.837                        | 0.376                     |
+| model_agnostic_covariates | Nerrigundah | 1536.000          | 25.000            | 100.000              | 100.000           | 1.000            | 90.523                        | 0.043                     |
+| model_agnostic_covariates | Tarrawarra  | 2154.000          | 25.000            | 100.000              | 100.000           | 1.000            | 98.662                        | 0.863                     |
 
 ### Seasonal distance from OzNet training space
 
-| feature_set               | site       | season | n_validation_rows | median_nn_percentile | fraction_nn_gt95 | median_mahalanobis_percentile | fraction_mahalanobis_gt95 |
-| ------------------------- | ---------- | ------ | ----------------- | -------------------- | ---------------- | ----------------------------- | ------------------------- |
-| static_terrain_soil       | Esdale     | autumn | 308.000           | 86.111               | 0.260            | 83.333                        | 0.182                     |
-| static_terrain_soil       | Esdale     | winter | 252.000           | 86.111               | 0.266            | 83.333                        | 0.179                     |
-| static_terrain_soil       | Llara      | autumn | 8617.000          | 88.889               | 0.149            | 80.556                        | 0.149                     |
-| static_terrain_soil       | Llara      | spring | 6208.000          | 88.889               | 0.154            | 80.556                        | 0.154                     |
-| static_terrain_soil       | Llara      | summer | 7658.000          | 88.889               | 0.157            | 80.556                        | 0.157                     |
-| static_terrain_soil       | Llara      | winter | 6764.000          | 88.889               | 0.156            | 80.556                        | 0.156                     |
-| static_terrain_soil       | Tarrawarra | autumn | 663.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
-| static_terrain_soil       | Tarrawarra | spring | 994.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
-| static_terrain_soil       | Tarrawarra | summer | 333.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
-| static_terrain_soil       | Tarrawarra | winter | 164.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
-| model_agnostic_covariates | Esdale     | autumn | 308.000           | 100.000              | 1.000            | 69.958                        | 0.107                     |
-| model_agnostic_covariates | Esdale     | winter | 252.000           | 100.000              | 1.000            | 51.475                        | 0.024                     |
-| model_agnostic_covariates | Llara      | autumn | 8617.000          | 100.000              | 1.000            | 98.543                        | 0.907                     |
-| model_agnostic_covariates | Llara      | spring | 6208.000          | 100.000              | 1.000            | 98.437                        | 0.850                     |
-| model_agnostic_covariates | Llara      | summer | 7658.000          | 100.000              | 1.000            | 98.131                        | 0.827                     |
-| model_agnostic_covariates | Llara      | winter | 6764.000          | 100.000              | 1.000            | 97.986                        | 0.761                     |
-| model_agnostic_covariates | Tarrawarra | autumn | 663.000           | 100.000              | 1.000            | 99.478                        | 1.000                     |
-| model_agnostic_covariates | Tarrawarra | spring | 994.000           | 100.000              | 1.000            | 96.649                        | 0.702                     |
-| model_agnostic_covariates | Tarrawarra | summer | 333.000           | 100.000              | 1.000            | 99.117                        | 1.000                     |
-| model_agnostic_covariates | Tarrawarra | winter | 164.000           | 100.000              | 1.000            | 98.268                        | 1.000                     |
+| feature_set               | site        | season | n_validation_rows | median_nn_percentile | fraction_nn_gt95 | median_mahalanobis_percentile | fraction_mahalanobis_gt95 |
+| ------------------------- | ----------- | ------ | ----------------- | -------------------- | ---------------- | ----------------------------- | ------------------------- |
+| static_terrain_soil       | Esdale      | autumn | 308.000           | 86.111               | 0.260            | 83.333                        | 0.182                     |
+| static_terrain_soil       | Esdale      | winter | 252.000           | 86.111               | 0.266            | 83.333                        | 0.179                     |
+| static_terrain_soil       | Llara       | autumn | 8617.000          | 88.889               | 0.149            | 80.556                        | 0.149                     |
+| static_terrain_soil       | Llara       | spring | 5821.000          | 88.889               | 0.156            | 80.556                        | 0.156                     |
+| static_terrain_soil       | Llara       | summer | 7188.000          | 88.889               | 0.158            | 80.556                        | 0.158                     |
+| static_terrain_soil       | Llara       | winter | 6764.000          | 88.889               | 0.156            | 80.556                        | 0.156                     |
+| static_terrain_soil       | MRI         | autumn | 7179.000          | 88.889               | 0.119            | 83.333                        | 0.064                     |
+| static_terrain_soil       | MRI         | spring | 7490.000          | 88.889               | 0.120            | 83.333                        | 0.061                     |
+| static_terrain_soil       | MRI         | summer | 7129.000          | 88.889               | 0.126            | 83.333                        | 0.063                     |
+| static_terrain_soil       | MRI         | winter | 7248.000          | 88.889               | 0.119            | 83.333                        | 0.060                     |
+| static_terrain_soil       | Nerrigundah | spring | 1280.000          | 88.889               | 0.000            | 91.667                        | 0.258                     |
+| static_terrain_soil       | Nerrigundah | winter | 256.000           | 88.889               | 0.000            | 91.667                        | 0.258                     |
+| static_terrain_soil       | Tarrawarra  | autumn | 663.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
+| static_terrain_soil       | Tarrawarra  | spring | 994.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
+| static_terrain_soil       | Tarrawarra  | summer | 333.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
+| static_terrain_soil       | Tarrawarra  | winter | 164.000           | 86.111               | 0.000            | 36.111                        | 0.000                     |
+| model_agnostic_covariates | Esdale      | autumn | 308.000           | 100.000              | 1.000            | 69.958                        | 0.107                     |
+| model_agnostic_covariates | Esdale      | winter | 252.000           | 100.000              | 1.000            | 51.475                        | 0.024                     |
+| model_agnostic_covariates | Llara       | autumn | 8617.000          | 100.000              | 1.000            | 98.543                        | 0.907                     |
+| model_agnostic_covariates | Llara       | spring | 5821.000          | 100.000              | 1.000            | 98.451                        | 0.857                     |
+| model_agnostic_covariates | Llara       | summer | 7188.000          | 100.000              | 1.000            | 98.098                        | 0.819                     |
+| model_agnostic_covariates | Llara       | winter | 6764.000          | 100.000              | 1.000            | 97.986                        | 0.761                     |
+| model_agnostic_covariates | MRI         | autumn | 7179.000          | 100.000              | 1.000            | 90.971                        | 0.346                     |
+| model_agnostic_covariates | MRI         | spring | 7490.000          | 100.000              | 1.000            | 92.814                        | 0.409                     |
+| model_agnostic_covariates | MRI         | summer | 7129.000          | 100.000              | 1.000            | 93.159                        | 0.412                     |
+| model_agnostic_covariates | MRI         | winter | 7248.000          | 100.000              | 1.000            | 91.362                        | 0.336                     |
+| model_agnostic_covariates | Nerrigundah | spring | 1280.000          | 100.000              | 1.000            | 90.197                        | 0.035                     |
+| model_agnostic_covariates | Nerrigundah | winter | 256.000           | 100.000              | 1.000            | 92.851                        | 0.082                     |
+| model_agnostic_covariates | Tarrawarra  | autumn | 663.000           | 100.000              | 1.000            | 99.478                        | 1.000                     |
+| model_agnostic_covariates | Tarrawarra  | spring | 994.000           | 100.000              | 1.000            | 96.649                        | 0.702                     |
+| model_agnostic_covariates | Tarrawarra  | summer | 333.000           | 100.000              | 1.000            | 99.117                        | 1.000                     |
+| model_agnostic_covariates | Tarrawarra  | winter | 164.000           | 100.000              | 1.000            | 98.268                        | 1.000                     |
 
 ### Correlation between training distance and absolute error
 
 | feature_set               | base_model     | n         | distance_abs_error_correlation | median_abs_error_in_distribution | median_abs_error_above_95pct |
 | ------------------------- | -------------- | --------- | ------------------------------ | -------------------------------- | ---------------------------- |
-| static_terrain_soil       | model6_rf      | 31961.000 | -0.062                         | 9.167                            | 8.174                        |
-| static_terrain_soil       | model8_process | 31961.000 | -0.027                         | 7.901                            | 6.689                        |
-| model_agnostic_covariates | model6_rf      | 31961.000 | 0.014                          |                                  | 8.981                        |
-| model_agnostic_covariates | model8_process | 31961.000 | 0.007                          |                                  | 7.576                        |
+| static_terrain_soil       | model6_rf      | 61686.000 | 0.007                          | 8.130                            | 5.742                        |
+| static_terrain_soil       | model8_process | 61686.000 | 0.024                          | 7.463                            | 5.470                        |
+| model_agnostic_covariates | model6_rf      | 61686.000 | 0.007                          |                                  | 7.681                        |
+| model_agnostic_covariates | model8_process | 61686.000 | 0.003                          |                                  | 7.037                        |
 
 ### Strongest PC associations with bias and RMSE
 
-| feature_set               | scaling           | site       | pc_axis | metric                       | pc_metric_correlation | n_supports |
-| ------------------------- | ----------------- | ---------- | ------- | ---------------------------- | --------------------- | ---------- |
-| model_agnostic_covariates | site_standardised | Esdale     | PC3     | abs_bias_model6_minus_model8 | 0.560                 | 77.000     |
-| model_agnostic_covariates | site_standardised | Esdale     | PC3     | bias_model8_process          | -0.546                | 77.000     |
-| static_terrain_soil       | site_standardised | Llara      | PC2     | bias_model6_rf               | 0.542                 | 32.000     |
-| model_agnostic_covariates | global            | Esdale     | PC3     | bias_model6_rf               | -0.529                | 77.000     |
-| static_terrain_soil       | site_standardised | Esdale     | PC2     | bias_model6_rf               | -0.521                | 77.000     |
-| static_terrain_soil       | global            | Esdale     | PC2     | bias_model6_rf               | -0.514                | 77.000     |
-| model_agnostic_covariates | site_standardised | Esdale     | PC3     | bias_model6_rf               | -0.507                | 77.000     |
-| static_terrain_soil       | site_standardised | Esdale     | PC1     | bias_model8_process          | 0.507                 | 77.000     |
-| static_terrain_soil       | site_standardised | Esdale     | PC2     | abs_bias_model6_minus_model8 | 0.500                 | 77.000     |
-| model_agnostic_covariates | site_standardised | Esdale     | PC3     | rmse_model6_minus_model8     | 0.493                 | 77.000     |
-| static_terrain_soil       | global            | Esdale     | PC3     | bias_model6_rf               | -0.488                | 77.000     |
-| model_agnostic_covariates | site_standardised | Tarrawarra | PC2     | abs_bias_model6_minus_model8 | -0.478                | 169.000    |
-| static_terrain_soil       | global            | Esdale     | PC2     | abs_bias_model6_minus_model8 | 0.475                 | 77.000     |
-| model_agnostic_covariates | site_standardised | Tarrawarra | PC2     | rmse_model6_minus_model8     | -0.471                | 169.000    |
-| static_terrain_soil       | site_standardised | Tarrawarra | PC2     | bias_model8_process          | -0.465                | 169.000    |
-| model_agnostic_covariates | site_standardised | Llara      | PC3     | bias_model6_rf               | 0.464                 | 32.000     |
-| model_agnostic_covariates | global            | Esdale     | PC3     | abs_bias_model6_minus_model8 | 0.456                 | 77.000     |
-| static_terrain_soil       | site_standardised | Esdale     | PC2     | rmse_model6_minus_model8     | 0.447                 | 77.000     |
-| static_terrain_soil       | site_standardised | Esdale     | PC2     | bias_model8_process          | -0.440                | 77.000     |
-| model_agnostic_covariates | site_standardised | Esdale     | PC3     | rmse_model8_process          | -0.439                | 77.000     |
-| static_terrain_soil       | site_standardised | Llara      | PC2     | bias_model8_process          | 0.438                 | 32.000     |
-| static_terrain_soil       | global            | Esdale     | PC2     | rmse_model6_minus_model8     | 0.433                 | 77.000     |
-| model_agnostic_covariates | global            | Llara      | PC3     | bias_model6_rf               | 0.426                 | 32.000     |
-| model_agnostic_covariates | global            | Esdale     | PC3     | rmse_model6_minus_model8     | 0.426                 | 77.000     |
-| static_terrain_soil       | global            | Tarrawarra | PC3     | bias_model8_process          | -0.418                | 169.000    |
-| static_terrain_soil       | site_standardised | Tarrawarra | PC1     | rmse_model6_minus_model8     | -0.415                | 169.000    |
-| static_terrain_soil       | global            | Esdale     | PC2     | bias_model8_process          | -0.409                | 77.000     |
-| static_terrain_soil       | site_standardised | Esdale     | PC1     | rmse_model8_process          | 0.409                 | 77.000     |
-| static_terrain_soil       | site_standardised | Llara      | PC2     | rmse_model8_process          | -0.401                | 32.000     |
-| static_terrain_soil       | global            | Tarrawarra | PC3     | rmse_model8_process          | 0.396                 | 169.000    |
+| feature_set               | scaling           | site        | pc_axis | metric                       | pc_metric_correlation | n_supports |
+| ------------------------- | ----------------- | ----------- | ------- | ---------------------------- | --------------------- | ---------- |
+| static_terrain_soil       | site_standardised | Esdale      | PC1     | bias_model6_rf               | -0.605                | 77.000     |
+| static_terrain_soil       | site_standardised | Nerrigundah | PC1     | bias_model6_rf               | -0.595                | 128.000    |
+| static_terrain_soil       | site_standardised | Nerrigundah | PC1     | bias_model8_process          | -0.592                | 128.000    |
+| model_agnostic_covariates | site_standardised | Esdale      | PC2     | bias_model6_rf               | -0.581                | 77.000     |
+| static_terrain_soil       | site_standardised | Esdale      | PC1     | bias_model8_process          | -0.576                | 77.000     |
+| static_terrain_soil       | site_standardised | Esdale      | PC1     | abs_bias_model6_minus_model8 | 0.564                 | 77.000     |
+| static_terrain_soil       | site_standardised | MRI         | PC1     | bias_model6_rf               | 0.564                 | 18.000     |
+| model_agnostic_covariates | site_standardised | Nerrigundah | PC2     | bias_model8_process          | -0.563                | 128.000    |
+| static_terrain_soil       | site_standardised | MRI         | PC1     | bias_model8_process          | 0.562                 | 18.000     |
+| static_terrain_soil       | site_standardised | Nerrigundah | PC1     | rmse_model6_minus_model8     | 0.557                 | 128.000    |
+| model_agnostic_covariates | site_standardised | Nerrigundah | PC2     | bias_model6_rf               | -0.550                | 128.000    |
+| model_agnostic_covariates | site_standardised | Esdale      | PC2     | abs_bias_model6_minus_model8 | 0.543                 | 77.000     |
+| model_agnostic_covariates | site_standardised | MRI         | PC1     | rmse_model6_rf               | 0.525                 | 18.000     |
+| model_agnostic_covariates | site_standardised | MRI         | PC1     | bias_model6_rf               | -0.523                | 18.000     |
+| model_agnostic_covariates | site_standardised | MRI         | PC1     | bias_model8_process          | -0.521                | 18.000     |
+| model_agnostic_covariates | site_standardised | MRI         | PC1     | rmse_model8_process          | 0.519                 | 18.000     |
+| model_agnostic_covariates | site_standardised | Tarrawarra  | PC2     | bias_model8_process          | -0.518                | 169.000    |
+| model_agnostic_covariates | site_standardised | Llara       | PC2     | bias_model6_rf               | 0.517                 | 32.000     |
+| static_terrain_soil       | site_standardised | Esdale      | PC1     | rmse_model6_minus_model8     | 0.514                 | 77.000     |
+| model_agnostic_covariates | site_standardised | Nerrigundah | PC2     | rmse_model6_minus_model8     | 0.510                 | 128.000    |
+| static_terrain_soil       | site_standardised | Nerrigundah | PC1     | abs_bias_model6_minus_model8 | 0.502                 | 128.000    |
+| model_agnostic_covariates | site_standardised | Esdale      | PC2     | bias_model8_process          | -0.488                | 77.000     |
+| static_terrain_soil       | site_standardised | Tarrawarra  | PC3     | abs_bias_model6_minus_model8 | -0.486                | 169.000    |
+| model_agnostic_covariates | site_standardised | Esdale      | PC2     | rmse_model6_minus_model8     | 0.479                 | 77.000     |
+| static_terrain_soil       | site_standardised | Llara       | PC3     | bias_model6_rf               | 0.476                 | 32.000     |
+| static_terrain_soil       | site_standardised | Tarrawarra  | PC1     | bias_model8_process          | -0.474                | 169.000    |
+| static_terrain_soil       | site_standardised | Tarrawarra  | PC3     | rmse_model6_minus_model8     | -0.474                | 169.000    |
+| model_agnostic_covariates | site_standardised | Nerrigundah | PC2     | abs_bias_model6_minus_model8 | 0.464                 | 128.000    |
+| static_terrain_soil       | site_standardised | Esdale      | PC1     | rmse_model8_process          | -0.452                | 77.000     |
+| model_agnostic_covariates | site_standardised | MRI         | PC3     | rmse_model6_minus_model8     | -0.450                | 18.000     |
 
 ### Site-standardised PC feature decomposition
 
@@ -195,38 +241,38 @@ This table back-projects the PC/error correlations through the PCA loadings. It 
 
 | feature_set               | metric_family | feature       | mean_abs_contribution | max_abs_contribution | mean_signed_contribution | n_tests |
 | ------------------------- | ------------- | ------------- | --------------------- | -------------------- | ------------------------ | ------- |
-| model_agnostic_covariates | RMSE          | hli           | 0.057                 | 0.230                | 0.003                    | 27.000  |
-| model_agnostic_covariates | RMSE          | soil_clay     | 0.056                 | 0.192                | -0.015                   | 27.000  |
-| model_agnostic_covariates | RMSE          | soil_sand     | 0.055                 | 0.187                | 0.014                    | 27.000  |
-| model_agnostic_covariates | RMSE          | northness     | 0.046                 | 0.190                | 0.006                    | 27.000  |
-| model_agnostic_covariates | RMSE          | eastness      | 0.046                 | 0.184                | -0.006                   | 27.000  |
-| model_agnostic_covariates | RMSE          | rain_30       | 0.038                 | 0.128                | -0.008                   | 27.000  |
-| model_agnostic_covariates | RMSE          | rain_365_anom | 0.035                 | 0.121                | -0.009                   | 27.000  |
-| model_agnostic_covariates | RMSE          | twi           | 0.032                 | 0.117                | -0.006                   | 27.000  |
-| model_agnostic_covariates | bias          | hli           | 0.076                 | 0.261                | 0.002                    | 27.000  |
-| model_agnostic_covariates | bias          | soil_clay     | 0.069                 | 0.195                | 0.008                    | 27.000  |
-| model_agnostic_covariates | bias          | soil_sand     | 0.069                 | 0.190                | -0.008                   | 27.000  |
-| model_agnostic_covariates | bias          | northness     | 0.062                 | 0.216                | -0.000                   | 27.000  |
-| model_agnostic_covariates | bias          | eastness      | 0.054                 | 0.187                | 0.006                    | 27.000  |
-| model_agnostic_covariates | bias          | rain_30       | 0.044                 | 0.130                | 0.006                    | 27.000  |
-| model_agnostic_covariates | bias          | slope         | 0.043                 | 0.193                | -0.002                   | 27.000  |
-| model_agnostic_covariates | bias          | twi           | 0.042                 | 0.133                | 0.003                    | 27.000  |
-| static_terrain_soil       | RMSE          | hli           | 0.065                 | 0.274                | 0.004                    | 27.000  |
-| static_terrain_soil       | RMSE          | eastness      | 0.065                 | 0.176                | -0.009                   | 27.000  |
-| static_terrain_soil       | RMSE          | twi           | 0.061                 | 0.214                | 0.023                    | 27.000  |
-| static_terrain_soil       | RMSE          | northness     | 0.059                 | 0.227                | 0.013                    | 27.000  |
-| static_terrain_soil       | RMSE          | soil_clay     | 0.058                 | 0.224                | -0.030                   | 27.000  |
-| static_terrain_soil       | RMSE          | slope         | 0.056                 | 0.141                | -0.006                   | 27.000  |
-| static_terrain_soil       | RMSE          | soil_sand     | 0.056                 | 0.220                | 0.028                    | 27.000  |
-| static_terrain_soil       | RMSE          | accumulation  | 0.053                 | 0.211                | 0.025                    | 27.000  |
-| static_terrain_soil       | bias          | hli           | 0.092                 | 0.332                | -0.002                   | 27.000  |
-| static_terrain_soil       | bias          | eastness      | 0.086                 | 0.213                | 0.006                    | 27.000  |
-| static_terrain_soil       | bias          | northness     | 0.083                 | 0.275                | -0.009                   | 27.000  |
-| static_terrain_soil       | bias          | twi           | 0.075                 | 0.229                | -0.017                   | 27.000  |
-| static_terrain_soil       | bias          | slope         | 0.075                 | 0.171                | 0.005                    | 27.000  |
-| static_terrain_soil       | bias          | soil_clay     | 0.069                 | 0.273                | 0.019                    | 27.000  |
-| static_terrain_soil       | bias          | soil_sand     | 0.067                 | 0.269                | -0.018                   | 27.000  |
-| static_terrain_soil       | bias          | soil_bdw      | 0.065                 | 0.141                | 0.012                    | 27.000  |
+| model_agnostic_covariates | RMSE          | hli           | 0.063                 | 0.286                | 0.004                    | 45.000  |
+| model_agnostic_covariates | RMSE          | soil_sand     | 0.059                 | 0.189                | 0.016                    | 45.000  |
+| model_agnostic_covariates | RMSE          | soil_clay     | 0.056                 | 0.173                | -0.015                   | 45.000  |
+| model_agnostic_covariates | RMSE          | northness     | 0.052                 | 0.232                | 0.003                    | 45.000  |
+| model_agnostic_covariates | RMSE          | elevation     | 0.052                 | 0.151                | 0.007                    | 45.000  |
+| model_agnostic_covariates | RMSE          | slope         | 0.051                 | 0.196                | 0.008                    | 45.000  |
+| model_agnostic_covariates | RMSE          | vpd_30        | 0.049                 | 0.161                | -0.002                   | 45.000  |
+| model_agnostic_covariates | RMSE          | rain_365_anom | 0.045                 | 0.154                | -0.008                   | 45.000  |
+| model_agnostic_covariates | bias          | hli           | 0.087                 | 0.326                | -0.002                   | 45.000  |
+| model_agnostic_covariates | bias          | northness     | 0.072                 | 0.265                | -0.002                   | 45.000  |
+| model_agnostic_covariates | bias          | slope         | 0.067                 | 0.223                | -0.004                   | 45.000  |
+| model_agnostic_covariates | bias          | soil_sand     | 0.062                 | 0.170                | -0.006                   | 45.000  |
+| model_agnostic_covariates | bias          | soil_clay     | 0.059                 | 0.156                | 0.005                    | 45.000  |
+| model_agnostic_covariates | bias          | elevation     | 0.058                 | 0.145                | -0.002                   | 45.000  |
+| model_agnostic_covariates | bias          | eastness      | 0.053                 | 0.148                | 0.002                    | 45.000  |
+| model_agnostic_covariates | bias          | vpd_30        | 0.052                 | 0.160                | 0.003                    | 45.000  |
+| static_terrain_soil       | RMSE          | soil_clay     | 0.084                 | 0.208                | -0.034                   | 45.000  |
+| static_terrain_soil       | RMSE          | soil_sand     | 0.083                 | 0.201                | 0.032                    | 45.000  |
+| static_terrain_soil       | RMSE          | hli           | 0.083                 | 0.282                | -0.013                   | 45.000  |
+| static_terrain_soil       | RMSE          | slope         | 0.065                 | 0.208                | -0.010                   | 45.000  |
+| static_terrain_soil       | RMSE          | accumulation  | 0.064                 | 0.176                | 0.017                    | 45.000  |
+| static_terrain_soil       | RMSE          | northness     | 0.063                 | 0.246                | -0.003                   | 45.000  |
+| static_terrain_soil       | RMSE          | twi           | 0.062                 | 0.182                | 0.016                    | 45.000  |
+| static_terrain_soil       | RMSE          | eastness      | 0.053                 | 0.146                | -0.019                   | 45.000  |
+| static_terrain_soil       | bias          | hli           | 0.109                 | 0.307                | 0.011                    | 45.000  |
+| static_terrain_soil       | bias          | soil_clay     | 0.103                 | 0.213                | 0.016                    | 45.000  |
+| static_terrain_soil       | bias          | soil_sand     | 0.101                 | 0.218                | -0.014                   | 45.000  |
+| static_terrain_soil       | bias          | slope         | 0.085                 | 0.226                | 0.010                    | 45.000  |
+| static_terrain_soil       | bias          | northness     | 0.083                 | 0.267                | 0.004                    | 45.000  |
+| static_terrain_soil       | bias          | accumulation  | 0.066                 | 0.180                | -0.013                   | 45.000  |
+| static_terrain_soil       | bias          | twi           | 0.062                 | 0.187                | -0.013                   | 45.000  |
+| static_terrain_soil       | bias          | eastness      | 0.061                 | 0.150                | 0.011                    | 45.000  |
 
 ### Direct site-standardised covariate/error correlations
 
@@ -234,55 +280,55 @@ This is a simpler companion diagnostic: support-level covariates are standardise
 
 | metric_family | feature    | mean_abs_correlation | max_abs_correlation | n_tests |
 | ------------- | ---------- | -------------------- | ------------------- | ------- |
-| RMSE          | northness  | 0.258                | 0.376               | 9.000   |
-| RMSE          | hli        | 0.257                | 0.412               | 9.000   |
-| RMSE          | soil_sand  | 0.244                | 0.535               | 9.000   |
-| RMSE          | soil_clay  | 0.228                | 0.512               | 9.000   |
-| RMSE          | rain_7     | 0.224                | 0.372               | 9.000   |
-| RMSE          | eastness   | 0.209                | 0.372               | 9.000   |
-| RMSE          | smips_365d | 0.206                | 0.390               | 9.000   |
-| RMSE          | doy_sin    | 0.182                | 0.521               | 9.000   |
-| RMSE          | slope      | 0.177                | 0.327               | 9.000   |
-| RMSE          | smips_anom | 0.170                | 0.272               | 9.000   |
-| bias          | hli        | 0.375                | 0.523               | 9.000   |
-| bias          | northness  | 0.326                | 0.418               | 9.000   |
-| bias          | soil_sand  | 0.307                | 0.649               | 9.000   |
-| bias          | soil_clay  | 0.292                | 0.573               | 9.000   |
-| bias          | slope      | 0.285                | 0.437               | 9.000   |
-| bias          | eastness   | 0.229                | 0.381               | 9.000   |
-| bias          | soil_bdw   | 0.216                | 0.319               | 9.000   |
-| bias          | rain_7     | 0.207                | 0.283               | 9.000   |
-| bias          | elevation  | 0.195                | 0.357               | 9.000   |
-| bias          | soil_awc   | 0.145                | 0.224               | 9.000   |
+| RMSE          | northness  | 0.290                | 0.526               | 15.000  |
+| RMSE          | rain_7     | 0.271                | 0.523               | 15.000  |
+| RMSE          | soil_sand  | 0.263                | 0.535               | 15.000  |
+| RMSE          | doy_sin    | 0.257                | 0.476               | 15.000  |
+| RMSE          | hli        | 0.252                | 0.420               | 15.000  |
+| RMSE          | smips_365d | 0.246                | 0.465               | 15.000  |
+| RMSE          | soil_clay  | 0.242                | 0.512               | 15.000  |
+| RMSE          | elevation  | 0.240                | 0.491               | 15.000  |
+| RMSE          | ppet_365   | 0.225                | 0.535               | 15.000  |
+| RMSE          | smips_anom | 0.218                | 0.373               | 15.000  |
+| bias          | northness  | 0.388                | 0.665               | 15.000  |
+| bias          | hli        | 0.377                | 0.525               | 15.000  |
+| bias          | soil_sand  | 0.333                | 0.649               | 15.000  |
+| bias          | slope      | 0.305                | 0.476               | 15.000  |
+| bias          | soil_clay  | 0.290                | 0.573               | 15.000  |
+| bias          | rain_7     | 0.277                | 0.445               | 15.000  |
+| bias          | elevation  | 0.257                | 0.536               | 15.000  |
+| bias          | doy_sin    | 0.217                | 0.513               | 15.000  |
+| bias          | eastness   | 0.196                | 0.381               | 15.000  |
+| bias          | rain_30    | 0.194                | 0.548               | 15.000  |
 
 ### Dominant PCA loadings
 
-| feature_set               | scaling           | feature   | PC1_loading | PC2_loading | PC1_PC2_abs_loading |
-| ------------------------- | ----------------- | --------- | ----------- | ----------- | ------------------- |
-| model_agnostic_covariates | global            | soil_bdw  | 0.156       | -0.309      | 0.346               |
-| model_agnostic_covariates | global            | elevation | 0.205       | -0.272      | 0.341               |
-| model_agnostic_covariates | global            | rain_365  | -0.226      | 0.254       | 0.340               |
-| model_agnostic_covariates | global            | doy_cos   | 0.247       | 0.218       | 0.329               |
-| model_agnostic_covariates | global            | soil_clay | 0.040       | 0.326       | 0.329               |
-| model_agnostic_covariates | global            | vpd_30    | 0.220       | 0.241       | 0.326               |
-| model_agnostic_covariates | site_standardised | vpd_30    | -0.397      | 0.170       | 0.432               |
-| model_agnostic_covariates | site_standardised | rain_365  | 0.407       | -0.122      | 0.425               |
-| model_agnostic_covariates | site_standardised | ppet_365  | 0.385       | -0.173      | 0.422               |
-| model_agnostic_covariates | site_standardised | ppet_30   | 0.419       | -0.032      | 0.421               |
-| model_agnostic_covariates | site_standardised | soil_clay | 0.041       | 0.407       | 0.409               |
-| model_agnostic_covariates | site_standardised | soil_sand | -0.028      | -0.398      | 0.399               |
-| static_terrain_soil       | global            | northness | 0.184       | 0.511       | 0.543               |
-| static_terrain_soil       | global            | hli       | 0.131       | 0.510       | 0.527               |
-| static_terrain_soil       | global            | eastness  | 0.105       | 0.472       | 0.484               |
-| static_terrain_soil       | global            | soil_clay | 0.422       | -0.161      | 0.451               |
-| static_terrain_soil       | global            | soil_sand | -0.404      | 0.143       | 0.428               |
-| static_terrain_soil       | global            | soil_bdw  | -0.409      | -0.108      | 0.423               |
-| static_terrain_soil       | site_standardised | hli       | 0.059       | 0.612       | 0.615               |
-| static_terrain_soil       | site_standardised | soil_clay | 0.539       | -0.051      | 0.542               |
-| static_terrain_soil       | site_standardised | soil_sand | -0.530      | 0.056       | 0.533               |
-| static_terrain_soil       | site_standardised | northness | 0.016       | 0.508       | 0.508               |
-| static_terrain_soil       | site_standardised | eastness  | 0.288       | 0.393       | 0.487               |
-| static_terrain_soil       | site_standardised | elevation | -0.342      | -0.129      | 0.365               |
+| feature_set               | scaling           | feature           | PC1_loading | PC2_loading | PC1_PC2_abs_loading |
+| ------------------------- | ----------------- | ----------------- | ----------- | ----------- | ------------------- |
+| model_agnostic_covariates | global            | ppet_30           | -0.093      | 0.385       | 0.397               |
+| model_agnostic_covariates | global            | soil_sand         | 0.073       | 0.371       | 0.378               |
+| model_agnostic_covariates | global            | elevation         | 0.267       | 0.210       | 0.340               |
+| model_agnostic_covariates | global            | vpd_30            | 0.163       | -0.292      | 0.334               |
+| model_agnostic_covariates | global            | smips_totalbucket | 0.333       | 0.020       | 0.334               |
+| model_agnostic_covariates | global            | rain_365          | -0.245      | -0.226      | 0.333               |
+| model_agnostic_covariates | site_standardised | hli               | -0.058      | 0.562       | 0.564               |
+| model_agnostic_covariates | site_standardised | northness         | -0.066      | 0.456       | 0.461               |
+| model_agnostic_covariates | site_standardised | ppet_30           | 0.410       | 0.048       | 0.413               |
+| model_agnostic_covariates | site_standardised | rain_365          | 0.409       | 0.039       | 0.411               |
+| model_agnostic_covariates | site_standardised | ppet_365          | 0.397       | 0.040       | 0.399               |
+| model_agnostic_covariates | site_standardised | slope             | -0.048      | 0.385       | 0.388               |
+| static_terrain_soil       | global            | soil_awc          | 0.115       | 0.537       | 0.549               |
+| static_terrain_soil       | global            | soil_bdw          | 0.405       | -0.316      | 0.514               |
+| static_terrain_soil       | global            | eastness          | -0.296      | -0.410      | 0.505               |
+| static_terrain_soil       | global            | hli               | -0.334      | -0.361      | 0.492               |
+| static_terrain_soil       | global            | soil_sand         | 0.434       | 0.193       | 0.475               |
+| static_terrain_soil       | global            | soil_clay         | -0.397      | 0.240       | 0.464               |
+| static_terrain_soil       | site_standardised | hli               | 0.506       | 0.147       | 0.527               |
+| static_terrain_soil       | site_standardised | twi               | -0.024      | 0.523       | 0.523               |
+| static_terrain_soil       | site_standardised | accumulation      | 0.066       | 0.498       | 0.502               |
+| static_terrain_soil       | site_standardised | soil_sand         | 0.360       | -0.323      | 0.484               |
+| static_terrain_soil       | site_standardised | northness         | 0.442       | 0.150       | 0.467               |
+| static_terrain_soil       | site_standardised | soil_clay         | -0.352      | 0.293       | 0.458               |
 
 ## 8. Figures
 
@@ -331,7 +377,7 @@ This is a simpler companion diagnostic: support-level covariates are standardise
 For the publication-facing report, I would use:
 
 1. one global-scaled static terrain-soil PCA panel to show site separation;
-2. one site-standardised static PCA panel coloured by RMSE and bias to show whether bad supports occupy analogous covariate positions;
+2. one site-standardised static PCA panel coloured by RMSE to show whether bad supports occupy analogous covariate positions, with signed-bias PCA retained as a diagnostic supplement;
 3. one dynamic covariate-space training-distance figure to quantify how far each validation site/date is from OzNet;
 4. a small table of PC-decomposed bias/RMSE associations and worst-support overlap.
 

@@ -2,7 +2,7 @@
 """Model-agnostic covariate PCA and terrain residual stratification report.
 
 This is intentionally separate from the main dense-validation manuscript.  It
-asks a narrower diagnostic question: do Esdale, Tarrawarra and Llara occupy
+asks a narrower diagnostic question: do the retained validation sites occupy
 different parts of the model-agnostic covariate space, and do model6/model8
 errors cluster in consistent terrain/climate covariate locations?
 
@@ -135,7 +135,17 @@ MODEL_LABELS = {
 SITE_COLORS = {
     "Esdale": "#4477AA",
     "Tarrawarra": "#228833",
+    "Nerrigundah": "#AA3377",
     "Llara": "#CC6677",
+    "MRI": "#EE7733",
+}
+
+SITE_MARKERS = {
+    "Esdale": "o",
+    "Tarrawarra": "s",
+    "Nerrigundah": "D",
+    "Llara": "^",
+    "MRI": "P",
 }
 
 
@@ -164,6 +174,14 @@ def finite_corr(x: Iterable[float], y: Iterable[float]) -> float:
 
 def feature_set_label(name: str) -> str:
     return FEATURE_SET_LABELS.get(name, name.replace("_", " "))
+
+
+def ordered_sites(values: Iterable[str]) -> list[str]:
+    order = ["Esdale", "Tarrawarra", "Nerrigundah", "Llara", "MRI"]
+    seen = {str(v) for v in values if pd.notna(v)}
+    out = [site for site in order if site in seen]
+    out.extend(sorted(seen.difference(out)))
+    return out
 
 
 def robust_markdown_table(df: pd.DataFrame, cols: list[str] | None = None, max_rows: int = 20) -> str:
@@ -374,8 +392,9 @@ def plot_site_pca(result: PcaResult, figdir: Path) -> Path:
     out = figdir / f"{result.feature_set}_{result.scaling}_site_pca.png"
 
     fig, ax = plt.subplots(figsize=(8.2, 6.2))
-    for site, g in scores.groupby("site", sort=True):
-        ax.scatter(g["PC1"], g["PC2"], s=36, alpha=0.78, edgecolor="white", linewidth=0.4, color=SITE_COLORS.get(site), label=site)
+    for site in ordered_sites(scores["site"]):
+        g = scores[scores["site"].eq(site)]
+        ax.scatter(g["PC1"], g["PC2"], s=36, alpha=0.78, edgecolor="white", linewidth=0.4, color=SITE_COLORS.get(site), marker=SITE_MARKERS.get(site, "o"), label=site)
         if len(g) >= 4:
             cx, cy = g["PC1"].mean(), g["PC2"].mean()
             ax.scatter([cx], [cy], s=160, marker="X", color=SITE_COLORS.get(site), edgecolor="black", linewidth=0.8)
@@ -412,7 +431,8 @@ def plot_rmse_pca(result: PcaResult, paired: pd.DataFrame, figdir: Path) -> Path
     vmin = np.nanpercentile(df[[m[0] for m in models]].to_numpy(dtype=float), 5)
     last = None
     for ax, (col, label) in zip(axes, models):
-        for site, g in df.groupby("site", sort=True):
+        for site in ordered_sites(df["site"]):
+            g = df[df["site"].eq(site)]
             last = ax.scatter(
                 g["PC1"],
                 g["PC2"],
@@ -424,7 +444,7 @@ def plot_rmse_pca(result: PcaResult, paired: pd.DataFrame, figdir: Path) -> Path
                 alpha=0.82,
                 edgecolor="white",
                 linewidth=0.35,
-                marker={"Esdale": "o", "Tarrawarra": "s", "Llara": "^"}.get(site, "o"),
+                marker=SITE_MARKERS.get(site, "o"),
             )
         ax.axhline(0, color="0.86", linewidth=0.8)
         ax.axvline(0, color="0.86", linewidth=0.8)
@@ -432,13 +452,13 @@ def plot_rmse_pca(result: PcaResult, paired: pd.DataFrame, figdir: Path) -> Path
         ax.set_xlabel("PC1")
     axes[0].set_ylabel("PC2")
     handles = [
-        Line2D([0], [0], marker={"Esdale": "o", "Tarrawarra": "s", "Llara": "^"}.get(site, "o"), color="none", markerfacecolor="0.45", markeredgecolor="white", label=site, markersize=8)
-        for site in sorted(df["site"].dropna().unique())
+        Line2D([0], [0], marker=SITE_MARKERS.get(site, "o"), color="none", markerfacecolor=SITE_COLORS.get(site, "0.45"), markeredgecolor="white", label=site, markersize=8)
+        for site in ordered_sites(df["site"])
     ]
     axes[1].legend(handles=handles, frameon=False, title="site", loc="best")
     if last is not None:
-        cbar = fig.colorbar(last, ax=axes, shrink=0.82, pad=0.02)
-        cbar.set_label("support-level RMSE (%)")
+        cbar = fig.colorbar(last, ax=axes, shrink=0.82, pad=0.075)
+        cbar.set_label("support-level RMSE (%)", labelpad=14)
     title_scaling = "global-scaled" if result.scaling == "global" else "site-standardised"
     fig.suptitle(f"Where do the high-RMSE supports sit? {feature_set_label(result.feature_set)}, {title_scaling}", y=1.02)
     fig.tight_layout()
@@ -458,7 +478,8 @@ def plot_bias_pca(result: PcaResult, paired: pd.DataFrame, figdir: Path) -> Path
         vmax = 1.0
     last = None
     for ax, (col, label) in zip(axes, models):
-        for site, g in df.groupby("site", sort=True):
+        for site in ordered_sites(df["site"]):
+            g = df[df["site"].eq(site)]
             last = ax.scatter(
                 g["PC1"],
                 g["PC2"],
@@ -470,7 +491,7 @@ def plot_bias_pca(result: PcaResult, paired: pd.DataFrame, figdir: Path) -> Path
                 alpha=0.82,
                 edgecolor="white",
                 linewidth=0.35,
-                marker={"Esdale": "o", "Tarrawarra": "s", "Llara": "^"}.get(site, "o"),
+                marker=SITE_MARKERS.get(site, "o"),
             )
         ax.axhline(0, color="0.86", linewidth=0.8)
         ax.axvline(0, color="0.86", linewidth=0.8)
@@ -478,8 +499,8 @@ def plot_bias_pca(result: PcaResult, paired: pd.DataFrame, figdir: Path) -> Path
         ax.set_xlabel("PC1")
     axes[0].set_ylabel("PC2")
     handles = [
-        Line2D([0], [0], marker={"Esdale": "o", "Tarrawarra": "s", "Llara": "^"}.get(site, "o"), color="none", markerfacecolor="0.45", markeredgecolor="white", label=site, markersize=8)
-        for site in sorted(df["site"].dropna().unique())
+        Line2D([0], [0], marker=SITE_MARKERS.get(site, "o"), color="none", markerfacecolor=SITE_COLORS.get(site, "0.45"), markeredgecolor="white", label=site, markersize=8)
+        for site in ordered_sites(df["site"])
     ]
     axes[1].legend(handles=handles, frameon=False, title="site", loc="best")
     if last is not None:
@@ -533,7 +554,7 @@ def plot_model_difference_pca(result: PcaResult, paired: pd.DataFrame, figdir: P
 def plot_training_distance(dist: pd.DataFrame, figdir: Path, feature_set: str) -> Path:
     out = figdir / f"{feature_set}_training_distance_by_site.png"
     metric = "nn_distance_percentile"
-    sites = list(dist["site"].dropna().unique())
+    sites = ordered_sites(dist["site"])
     fig, ax = plt.subplots(figsize=(8.6, 5.4))
     positions = np.arange(len(sites))
     data = [dist.loc[dist["site"] == s, metric].dropna().values for s in sites]
@@ -599,7 +620,7 @@ def plot_training_distance_by_season(dist: pd.DataFrame, figdir: Path, feature_s
         return None
     out = figdir / f"{feature_set}_training_mahalanobis_by_site_season.png"
     season_order = ["summer", "autumn", "winter", "spring"]
-    sites = sorted(dist["site"].dropna().unique())
+    sites = ordered_sites(dist["site"])
     x = np.arange(len(season_order))
 
     fig, ax = plt.subplots(figsize=(8.8, 5.4))
@@ -696,7 +717,7 @@ def plot_seasonal_distance_skill(dist: pd.DataFrame, pred: pd.DataFrame, figdir:
         ax.set_ylabel(ylabel)
     handles = [
         Line2D([0], [0], marker="o", linestyle="none", color="none", markerfacecolor=SITE_COLORS.get(site), markeredgecolor="white", label=site, markersize=9)
-        for site in sorted(agg["site"].unique())
+        for site in ordered_sites(agg["site"])
     ]
     handles.extend(
         [
@@ -1033,6 +1054,8 @@ def write_report(
         )
     else:
         direct_summary = pd.DataFrame()
+    site_names = ordered_sites(pca_results[0].scores["site"]) if pca_results else []
+    site_list = ", ".join(site_names) if site_names else "the retained validation sites"
 
     md = f"""# Model-agnostic covariate PCA and terrain residual stratification scaffold
 
@@ -1040,7 +1063,7 @@ This is a separate diagnostic report for the dense validation work. It is design
 
 ## 1. Purpose
 
-The main question is whether the three dense validation sites occupy comparable or distinct parts of the model-agnostic covariate space, and whether model failures occur in the same parts of that space across sites. This matters because a model can have acceptable pooled skill while still failing systematically in particular terrain, soil, exposure, or seasonal-climate contexts.
+The main question is whether the retained validation sites occupy comparable or distinct parts of the model-agnostic covariate space, and whether model failures occur in the same parts of that space across sites. This matters because a model can have acceptable pooled skill while still failing systematically in particular terrain, soil, exposure, or seasonal-climate contexts.
 
 The analysis is framed around four working hypotheses.
 
@@ -1053,7 +1076,7 @@ The analysis is framed around four working hypotheses.
 
 - Validation predictions: `{pred_path}`
 - OzNet training covariate table: `{train_path}`
-- Validation sites: Esdale, Tarrawarra, and Llara.
+- Validation sites: {site_list}.
 - Models compared: model6 statistical RF/HGB and model8 process bucket.
 
 All PCA inputs are model-agnostic covariates already present in the validation prediction table, not covariates from the raw point-measurement CSVs.
@@ -1072,7 +1095,7 @@ Three related spaces are scaffolded.
 
 For each feature space, features are median-imputed and standardised once across pooled validation supports. PCA is then fitted to the pooled support matrix. This preserves absolute between-site differences. Large separation of site centroids means the sites occupy different parts of covariate space.
 
-Interpretation: this is the right view for asking whether Esdale, Tarrawarra, and Llara are genuinely different environments to the model.
+Interpretation: this is the right view for asking whether the validation sites are genuinely different environments to the model.
 
 ### 4.2 Site-standardised PCA
 
@@ -1202,7 +1225,7 @@ This is a simpler companion diagnostic: support-level covariates are standardise
 For the publication-facing report, I would use:
 
 1. one global-scaled static terrain-soil PCA panel to show site separation;
-2. one site-standardised static PCA panel coloured by RMSE and bias to show whether bad supports occupy analogous covariate positions;
+2. one site-standardised static PCA panel coloured by RMSE to show whether bad supports occupy analogous covariate positions, with signed-bias PCA retained as a diagnostic supplement;
 3. one dynamic covariate-space training-distance figure to quantify how far each validation site/date is from OzNet;
 4. a small table of PC-decomposed bias/RMSE associations and worst-support overlap.
 

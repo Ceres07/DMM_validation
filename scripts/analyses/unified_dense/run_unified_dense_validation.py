@@ -66,10 +66,20 @@ SITE_NOTES = {
         "a known SMIPS-zero caveat, so model6 skill here should be read partly as "
         "a missing coarse-anchor ablation rather than a normal model6 prediction."
     ),
+    "Nerrigundah": (
+        "Tarrawarra-like 1997 15 cm TDR grid campaign. Local grid observations "
+        "are converted from the published AMG/local transform and aggregated to "
+        "model prediction grid cells by date before validation."
+    ),
     "Llara": (
         "Thirty-two profile-mean probes across two paddocks from 2021–2024. Strongest "
         "temporal/seasonal coverage. Point-level SMIPS-derived columns are present, "
         "but full gridded Llara model GeoTIFFs are not currently cached."
+    ),
+    "MRI": (
+        "Mulloon Rehydration Initiative profile-mean probe network. Probe labels "
+        "and coordinates are read from the Soil_Moisture_Probes GeoPackage layer "
+        "and crosswalked to logger serials where possible."
     ),
 }
 
@@ -78,7 +88,26 @@ MODEL_LABELS = {
     "model8_process": "model8 process",
 }
 
-PREFERRED_SITE_ORDER = ["Esdale", "Tarrawarra", "Llara"]
+PREFERRED_SITE_ORDER = ["Esdale", "Tarrawarra", "Nerrigundah", "Llara", "MRI"]
+
+STAGE1_SITE_PATHS = {
+    "Esdale": ROOT / "outputs" / "model6_vs_model8_dense" / "model6_model8_combined_predictions.csv",
+    "Tarrawarra": ROOT
+    / "outputs"
+    / "tarrawarra_model6_vs_model8"
+    / "model6_model8_combined_predictions_valid_30m_gridcell.csv",
+    "Nerrigundah": ROOT
+    / "outputs"
+    / "nerrigundah_model6_vs_model8"
+    / "model6_model8_combined_predictions_valid_30m_gridcell.csv",
+    "Llara": ROOT / "outputs" / "llara_unseen_model6_vs_model8" / "llara_model6_model8_predictions.csv",
+    "MRI": ROOT / "outputs" / "mri_dense_validation" / "mri_model6_model8_predictions.csv",
+}
+
+QC_START_DATES = {
+    "MRI": "2021-07-01",
+    "Llara": "2022-01-01",
+}
 
 
 def ordered_sites(values: pd.Series | list[str] | set[str]) -> list[str]:
@@ -106,7 +135,7 @@ STAGE1_FIGURES = [
         "Bias in driest and wettest observed moisture quartiles.",
     ),
     (
-        "figures/stage1/predicted_vs_observed_timeseries_three_sites.png",
+        "figures/stage1/predicted_vs_observed_timeseries_validation_sites.png",
         "Observed and predicted spatial-mean time series",
         "Date-wise observed soil moisture compared with model6 and model8 spatial means for each site.",
     ),
@@ -151,10 +180,22 @@ def safe_name(text: str) -> str:
 
 def load_site_frames() -> dict[str, pd.DataFrame]:
     frames: dict[str, pd.DataFrame] = {}
-    for site, path in spiking.SITE_PATHS.items():
+    missing: list[tuple[str, Path]] = []
+    for site, path in STAGE1_SITE_PATHS.items():
+        if not path.exists():
+            missing.append((site, path))
+            continue
         df = spiking.load_site(site, path)
+        qc_start = QC_START_DATES.get(site)
+        if qc_start is not None:
+            df = df[df["date"] >= qc_start].copy()
+        if df.empty:
+            print(f"warning: {site} has no Stage 1 rows after QC filters", flush=True)
+            continue
         df["model_name"] = df["base_model"]
         frames[site] = df
+    for site, path in missing:
+        print(f"warning: missing Stage 1 site table for {site}: {path}", flush=True)
     return frames
 
 
@@ -169,7 +210,8 @@ def site_inventory(frames: dict[str, pd.DataFrame]) -> pd.DataFrame:
         rows.append(
             {
                 "site": site,
-                "source_table": str(spiking.SITE_PATHS[site]),
+                "source_table": str(STAGE1_SITE_PATHS[site]),
+                "qc_start_date": QC_START_DATES.get(site, ""),
                 "rows": int(len(df)),
                 "models": ",".join(sorted(df["base_model"].unique())),
                 "points_unique": int(df["point_id"].nunique()),
@@ -601,7 +643,7 @@ def run_stage1(
 
     summary = {
         "n_rows": int(len(combined)),
-        "sites": sorted(frames),
+        "sites": ordered_sites(frames.keys()),
         "models": sorted(combined["base_model"].unique()),
         "figures": [str(p) for p in figure_paths],
         "gallery_warnings": gallery_warnings,
@@ -724,6 +766,26 @@ def report_columns(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     return df[[c for c in cols if c in df.columns]].copy()
 
 
+def order_report_table(df: pd.DataFrame, extra_cols: list[str] | None = None) -> pd.DataFrame:
+    if not isinstance(df, pd.DataFrame) or df.empty or "site" not in df.columns:
+        return df
+    out = df.copy()
+    site_rank = {site: i for i, site in enumerate(PREFERRED_SITE_ORDER)}
+    model_rank = {"model6_rf": 0, "model8_process": 1}
+    out["_site_order"] = out["site"].map(site_rank).fillna(len(site_rank)).astype(int)
+    sort_cols = ["_site_order", "site"]
+    if "base_model" in out.columns:
+        out["_model_order"] = out["base_model"].map(model_rank).fillna(len(model_rank)).astype(int)
+        sort_cols.extend(["_model_order", "base_model"])
+    elif "model_a" in out.columns:
+        out["_model_order"] = out["model_a"].map(model_rank).fillna(len(model_rank)).astype(int)
+        sort_cols.extend(["_model_order", "model_a"])
+    for col in extra_cols or []:
+        if col in out.columns:
+            sort_cols.append(col)
+    return out.sort_values(sort_cols).drop(columns=["_site_order", "_model_order"], errors="ignore")
+
+
 def write_unified_report(
     report_path: Path,
     stage1: dict[str, object],
@@ -765,14 +827,17 @@ def write_unified_report(
         stage1["overall"],
         ["site", "base_model", "n", "nse", "pearson_r", "rmse", "ubrmse", "bias"],
     )
+    overall_report = order_report_table(overall_report)
     seasonal_report = report_columns(
         stage1["seasonal"],
         ["site", "base_model", "season", "n", "nse", "pearson_r", "rmse", "ubrmse", "bias"],
     )
+    seasonal_report = order_report_table(seasonal_report, ["season"])
     wetness_report = report_columns(
         stage1["wetness"],
         ["site", "base_model", "obs_moisture_quantile", "n", "nse", "pearson_r", "rmse", "ubrmse", "bias"],
     )
+    wetness_report = order_report_table(wetness_report, ["obs_moisture_quantile"])
     paired_overall_report = report_columns(
         stage1["paired_overall"],
         [
@@ -788,6 +853,7 @@ def write_unified_report(
             "bias_delta_a_minus_b",
         ],
     )
+    paired_overall_report = order_report_table(paired_overall_report)
 
     random_learning = (
         stage2_summary[
@@ -856,11 +922,17 @@ def write_unified_report(
 
     gallery_warnings = stage1.get("gallery_warnings") or []
     gallery_warning_text = "\n".join(f"- {w}" for w in gallery_warnings) if gallery_warnings else "_None._"
+    stage2_sites = ordered_sites(stage2_summary["site"].dropna().unique()) if not stage2_summary.empty else []
+    stage2_scope_text = (
+        ", ".join(stage2_sites)
+        if stage2_sites
+        else "No Stage 2 summary table was found for this run."
+    )
 
-    body = f"""# Unified dense-point validation and local-spiking report
+    body = f"""# Unified validation and local-spiking report
 
-This report resets the earlier ad hoc three-site sparse local-calibration work
-into the two-stage protocol described in
+This report collects the currently model-ready DMM validation datasets into the
+two-stage protocol described in
 `docs/Downscaling moisture validation plan.pdf`.
 
 The two stages are deliberately kept separate:
@@ -879,6 +951,13 @@ The two stages are deliberately kept separate:
 
 Important caveats:
 
+- Llara is trimmed to observations from `2022-01-01` onward for QC. MRI is
+  trimmed to observations from `2021-07-01` onward for QC. The original cached
+  site prediction tables are left intact; the trims are applied at unified-report
+  load time.
+- Nerrigundah is included as a Tarrawarra-like dense TDR grid campaign when its
+  converted/model-scored table is present. Its TDR points are aggregated to the
+  model prediction grid cell by date before validation.
 - Tarrawarra is retained because it is uniquely dense, but raw campaign points
   have been aggregated to the model prediction grid cell by date so that the
   validation support matches the raster support. The existing model6 run also
@@ -926,6 +1005,10 @@ matched observations. `bias_delta_a_minus_b` is model A bias minus model B bias.
 ## Stage 2 — local training-data spiking
 
 Budgets used: `{args.stage2_budgets}`.
+
+Stage 2 scope in the current summary tables: {stage2_scope_text}. MRI and
+Nerrigundah are kept out of this local-spiking intervention unless a
+separate Stage 2 design is added for their different sampling supports.
 
 Calibration methods:
 

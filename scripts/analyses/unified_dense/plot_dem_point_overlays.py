@@ -16,6 +16,7 @@ from datetime import date
 import json
 import os
 from pathlib import Path
+import shutil
 import sys
 from typing import Iterable
 
@@ -44,6 +45,21 @@ DEFAULT_TARRAWARRA_TABLE = (
 )
 DEFAULT_LLARA_TABLE = ROOT / "outputs/llara_unseen_model6_vs_model8/llara_model6_model8_predictions.csv"
 DEFAULT_LLARA_DEM_ROOT = ROOT / "outputs/unified_dense_validation/native_prediction_rasters/llara/ancillary"
+DEFAULT_NERRIGUNDAH_TABLE = (
+    ROOT / "outputs/nerrigundah_model6_vs_model8/model6_model8_combined_predictions_valid_30m_gridcell.csv"
+)
+DEFAULT_NERRIGUNDAH_DEM = (
+    ROOT
+    / "outputs/unified_dense_validation/native_prediction_rasters/nerrigundah/ancillary/"
+    / "nerrigundah_dem_30m_model_terrain_grid.tif"
+)
+DEFAULT_MRI_TABLE = ROOT / "outputs/mri_dense_validation/mri_model6_model8_predictions.csv"
+DEFAULT_MRI_DEM = (
+    ROOT
+    / "outputs/unified_dense_validation/native_prediction_rasters/mri/ancillary/"
+    / "mri_dem_30m_model_terrain_grid.tif"
+)
+DEFAULT_GLOBAL_PADDOCKTS_TMP = Path("/Users/dmitrygrishin/Downloads/PaddockTSTmp")
 
 
 @dataclass(frozen=True)
@@ -69,8 +85,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--tarrawarra-table", type=Path, default=DEFAULT_TARRAWARRA_TABLE)
     parser.add_argument("--llara-table", type=Path, default=DEFAULT_LLARA_TABLE)
     parser.add_argument("--llara-dem-root", type=Path, default=DEFAULT_LLARA_DEM_ROOT)
+    parser.add_argument("--nerrigundah-table", type=Path, default=DEFAULT_NERRIGUNDAH_TABLE)
+    parser.add_argument("--nerrigundah-dem", type=Path, default=DEFAULT_NERRIGUNDAH_DEM)
+    parser.add_argument("--mri-table", type=Path, default=DEFAULT_MRI_TABLE)
+    parser.add_argument("--mri-dem", type=Path, default=DEFAULT_MRI_DEM)
+    parser.add_argument("--global-paddockts-tmp", type=Path, default=DEFAULT_GLOBAL_PADDOCKTS_TMP)
     parser.add_argument("--force-esdale-dem", action="store_true")
-    parser.add_argument("--bbox-padding-deg", type=float, default=0.002)
+    parser.add_argument("--force-site-dems", action="store_true")
+    parser.add_argument("--bbox-padding-deg", type=float, default=0.01)
     parser.add_argument("--dpi", type=int, default=220)
     return parser.parse_args()
 
@@ -119,6 +141,15 @@ def esdale_bbox_from_template_or_points(args: argparse.Namespace, points: pd.Dat
     )
 
 
+def bbox_from_points(points: pd.DataFrame, padding_deg: float) -> tuple[float, float, float, float]:
+    return (
+        float(points["lon"].min() - padding_deg),
+        float(points["lat"].min() - padding_deg),
+        float(points["lon"].max() + padding_deg),
+        float(points["lat"].max() + padding_deg),
+    )
+
+
 def make_local_paddockts_config(cache_root: Path):
     from PaddockTS.config import Config, config as base_config
 
@@ -132,6 +163,66 @@ def make_local_paddockts_config(cache_root: Path):
         email=getattr(base_config, "email", None),
         tern_api_key=getattr(base_config, "tern_api_key", None),
     )
+
+
+def ensure_model_grid_dem(
+    *,
+    site: str,
+    dem_path: Path,
+    points: pd.DataFrame,
+    args: argparse.Namespace,
+    start_day: str,
+    stub: str,
+    source: str,
+) -> Path:
+    """Regenerate a true Copernicus/model terrain DEM for a validation site.
+
+    If a matching global PaddockTS terrain cache exists, copy it into the local
+    validation cache before calling the terrain-covariate function. This avoids
+    replacing a real gridded DEM with an interpolated point surface.
+    """
+
+    if dem_path.exists() and not args.force_site_dems:
+        return dem_path
+
+    if not args.dmm_repo.exists():
+        raise FileNotFoundError(args.dmm_repo)
+    sys.path.insert(0, str(args.dmm_repo))
+    dem_path.parent.mkdir(parents=True, exist_ok=True)
+
+    from PaddockTS.query import Query
+    from emt.covariates import terrain_covariates
+
+    local_config = make_local_paddockts_config(
+        ROOT / "outputs/unified_dense_validation/native_prediction_rasters" / site / "_paddockts_cache"
+    )
+    bbox = bbox_from_points(points, args.bbox_padding_deg)
+    day = date.fromisoformat(start_day)
+    q = Query(bbox=list(bbox), start=day, end=day, stub=stub, config=local_config)
+
+    local_aoi = Path(q.aoi_dir)
+    global_aoi = args.global_paddockts_tmp / "aoi" / q.bbox_hash
+    for name in ["terrain.tif", "terrain.tif._SUCCESS", "terrain_utm.tif"]:
+        src = global_aoi / name
+        dst = local_aoi / name
+        if src.exists() and not dst.exists():
+            shutil.copy2(src, dst)
+
+    terr = terrain_covariates(q)
+    terr["elevation"].rio.to_raster(dem_path)
+    metadata = {
+        "site": site,
+        "dem_path": str(dem_path),
+        "bbox_wsen": bbox,
+        "bbox_hash": q.bbox_hash,
+        "source": source,
+        "copied_from_global_cache": str(global_aoi) if global_aoi.exists() else None,
+    }
+    (dem_path.parent / f"{site}_dem_30m_model_terrain_grid_metadata.json").write_text(
+        json.dumps(metadata, indent=2),
+        encoding="utf-8",
+    )
+    return dem_path
 
 
 def ensure_esdale_dem(args: argparse.Namespace, points: pd.DataFrame) -> Path:
@@ -408,7 +499,9 @@ def draw_gallery(specs: Iterable[MapSpec], outputs: dict[str, Path], out: Path, 
         data, _transform, _crs, _bounds = read_dem(spec.dem_path)
         images.append((spec, data))
 
-    fig, axes = plt.subplots(2, 2, figsize=(12.5, 10.0))
+    ncols = 3 if len(specs) > 4 else 2
+    nrows = int(np.ceil(len(specs) / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(4.6 * ncols, 4.8 * nrows))
     axes = axes.ravel()
     for ax, (spec, _data) in zip(axes, images):
         img = plt.imread(outputs[spec.site])
@@ -427,6 +520,8 @@ def draw_gallery(specs: Iterable[MapSpec], outputs: dict[str, Path], out: Path, 
 def build_specs(args: argparse.Namespace) -> list[MapSpec]:
     esdale_points = load_unique_points(args.esdale_table)
     tarrawarra_points = load_unique_points(args.tarrawarra_table)
+    nerrigundah_points = load_unique_points(args.nerrigundah_table)
+    mri_points = load_unique_points(args.mri_table)
     llara_all = pd.read_csv(args.llara_table)
     specs = [
         MapSpec(
@@ -442,6 +537,36 @@ def build_specs(args: argparse.Namespace) -> list[MapSpec]:
             dem_path=args.tarrawarra_dem,
             points=tarrawarra_points,
             source_note="5 m converted campaign DEM; raw probes aggregated to model grid cells",
+        ),
+        MapSpec(
+            site="nerrigundah",
+            title="Nerrigundah terrain and 30 m validation cells",
+            dem_path=ensure_model_grid_dem(
+                site="nerrigundah",
+                dem_path=args.nerrigundah_dem,
+                points=nerrigundah_points,
+                args=args,
+                start_day="1997-08-27",
+                stub="nerrigundah_dem_model_terrain_grid",
+                source="DownscalingMoistureModel emt.covariates.terrain_covariates / PaddockTS Copernicus DEM",
+            ),
+            points=nerrigundah_points,
+            source_note="30 m Copernicus/model terrain grid; raw probes aggregated to model grid cells",
+        ),
+        MapSpec(
+            site="mri",
+            title="MRI probe-network terrain",
+            dem_path=ensure_model_grid_dem(
+                site="mri",
+                dem_path=args.mri_dem,
+                points=mri_points,
+                args=args,
+                start_day="2021-07-01",
+                stub="mri_dem_model_terrain_grid",
+                source="DownscalingMoistureModel emt.covariates.terrain_covariates / PaddockTS Copernicus DEM",
+            ),
+            points=mri_points,
+            source_note="30 m Copernicus/model terrain grid",
         ),
     ]
     for field in ["WE", "WW"]:

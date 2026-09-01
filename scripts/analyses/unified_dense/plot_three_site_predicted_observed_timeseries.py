@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot predicted-vs-observed spatial-mean time series for the three sites.
+"""Plot predicted-vs-observed spatial-mean time series for validation sites.
 
 Inputs are the model-agnostic prediction tables produced by the independent
 validation workflow. The output figure uses one row per site and overlays the
@@ -23,17 +23,20 @@ DEFAULT_INPUTS = {
     "Esdale": ROOT / "outputs/model6_vs_model8_dense/model6_model8_combined_predictions.csv",
     "Tarrawarra": ROOT
     / "outputs/tarrawarra_model6_vs_model8/model6_model8_combined_predictions_valid_30m_gridcell.csv",
+    "Nerrigundah": ROOT
+    / "outputs/nerrigundah_model6_vs_model8/model6_model8_combined_predictions_valid_30m_gridcell.csv",
     "Llara": ROOT / "outputs/llara_unseen_model6_vs_model8/llara_model6_model8_predictions.csv",
+    "MRI": ROOT / "outputs/mri_dense_validation/mri_model6_model8_predictions.csv",
 }
 DEFAULT_FIGURE = (
     ROOT
     / "reports/analyses/unified_dense_validation/figures/stage1/"
-    / "predicted_vs_observed_timeseries_three_sites.png"
+    / "predicted_vs_observed_timeseries_validation_sites.png"
 )
 DEFAULT_TABLE = (
     ROOT
     / "reports/analyses/unified_dense_validation/tables/"
-    / "predicted_vs_observed_timeseries_three_sites.csv"
+    / "predicted_vs_observed_timeseries_validation_sites.csv"
 )
 
 MODEL_LABELS = {
@@ -45,7 +48,11 @@ MODEL_COLORS = {
     "model6 RF": "#D55E00",
     "model8 process": "#0072B2",
 }
-SITE_ORDER = ["Esdale", "Tarrawarra", "Llara"]
+SITE_ORDER = ["Esdale", "Tarrawarra", "Nerrigundah", "Llara", "MRI"]
+QC_START_DATES = {
+    "Llara": "2022-01-01",
+    "MRI": "2021-07-01",
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -69,6 +76,9 @@ def load_site(site: str, path: Path) -> pd.DataFrame:
     df["obs_sm_pct"] = pd.to_numeric(df["obs_sm_pct"], errors="coerce")
     df["pred_sm_pct"] = pd.to_numeric(df["pred_sm_pct"], errors="coerce")
     df["model_label"] = df["model_name"].astype(str).map(MODEL_LABELS).fillna(df["model_name"].astype(str))
+    qc_start = QC_START_DATES.get(site)
+    if qc_start is not None:
+        df = df[df["date"] >= pd.Timestamp(qc_start)].copy()
     return df.dropna(subset=["obs_sm_pct", "pred_sm_pct"])
 
 
@@ -113,7 +123,7 @@ def plot(timeseries: pd.DataFrame, metrics: pd.DataFrame, out: Path) -> None:
     import matplotlib.pyplot as plt
 
     out.parent.mkdir(parents=True, exist_ok=True)
-    fig, axes = plt.subplots(len(SITE_ORDER), 1, figsize=(12.0, 9.2), sharex=False)
+    fig, axes = plt.subplots(len(SITE_ORDER), 1, figsize=(12.0, max(3.0 * len(SITE_ORDER), 9.2)), sharex=False)
     if len(SITE_ORDER) == 1:
         axes = [axes]
 
@@ -143,7 +153,7 @@ def plot(timeseries: pd.DataFrame, metrics: pd.DataFrame, out: Path) -> None:
                 m["pred_mean_pct"],
                 color=MODEL_COLORS[model],
                 linewidth=1.8,
-                marker="o" if site != "Llara" else None,
+                marker=None if site in {"Llara", "MRI"} else "o",
                 markersize=3.0,
                 alpha=0.95,
                 label=f"{model} predicted mean",
@@ -159,13 +169,15 @@ def plot(timeseries: pd.DataFrame, metrics: pd.DataFrame, out: Path) -> None:
             metric_lines.append(f"{model}: NSE {r.nse:.2f}, RMSE {r.rmse:.1f}%, bias {r.bias:+.1f}%")
         title = f"{site}: spatial mean predicted vs observed soil moisture"
         ax.set_title(title, loc="left", fontsize=12, fontweight="bold")
+        text_x = 0.99 if site == "MRI" else 0.01
+        text_ha = "right" if site == "MRI" else "left"
         ax.text(
-            0.01,
+            text_x,
             0.96,
             "\n".join(metric_lines),
             transform=ax.transAxes,
             va="top",
-            ha="left",
+            ha=text_ha,
             fontsize=9,
             bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.78, edgecolor="0.85"),
         )
@@ -175,10 +187,13 @@ def plot(timeseries: pd.DataFrame, metrics: pd.DataFrame, out: Path) -> None:
         locator = mdates.AutoDateLocator(minticks=4, maxticks=8)
         ax.xaxis.set_major_locator(locator)
         ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
-        ymin = np.nanmin([sub["obs_mean_pct"].min(), sub["pred_mean_pct"].min()])
-        ymax = np.nanmax([sub["obs_mean_pct"].max(), sub["pred_mean_pct"].max()])
-        pad = max(2.0, 0.08 * (ymax - ymin))
-        ax.set_ylim(max(0, ymin - pad), min(100, ymax + pad))
+        if site == "MRI":
+            ax.set_ylim(15, 60)
+        else:
+            ymin = np.nanmin([sub["obs_mean_pct"].min(), sub["pred_mean_pct"].min()])
+            ymax = np.nanmax([sub["obs_mean_pct"].max(), sub["pred_mean_pct"].max()])
+            pad = max(2.0, 0.08 * (ymax - ymin))
+            ax.set_ylim(max(0, ymin - pad), min(100, ymax + pad))
 
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="lower center", ncol=3, frameon=False)

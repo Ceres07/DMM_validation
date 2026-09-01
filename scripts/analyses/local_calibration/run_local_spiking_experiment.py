@@ -10,11 +10,13 @@ practical question is deliberately property-management flavoured:
     should they go, and does that small local information budget improve
     model6 RF and model8 process predictions differently?
 
-The experiment uses only the dense validation datasets:
+The experiment uses the retained model-ready validation datasets:
 
 - Esdale (formerly "dense validation");
 - Tarrawarra;
-- Llara.
+- Nerrigundah;
+- Llara;
+- MRI.
 
 For each site, local calibration points are selected under strategies that use
 either no soil-moisture information (random), model/terrain priors, or an
@@ -72,7 +74,7 @@ DEFAULT_REPORT_FIGDIR = (
 REPORT_FIGURES = (
     (
         "baseline_site_model_skill.png",
-        "Uncalibrated global model skill by dense site",
+        "Uncalibrated global model skill by validation site",
         "Baseline RMSE and NSE for model6 RF and model8 process before any local calibration.",
     ),
     (
@@ -115,7 +117,17 @@ SITE_PATHS = {
     / "outputs"
     / "tarrawarra_model6_vs_model8"
     / "model6_model8_combined_predictions_valid_30m_gridcell.csv",
+    "Nerrigundah": DMM_VALIDATION_ROOT
+    / "outputs"
+    / "nerrigundah_model6_vs_model8"
+    / "model6_model8_combined_predictions_valid_30m_gridcell.csv",
     "Llara": DMM_VALIDATION_ROOT / "outputs" / "llara_unseen_model6_vs_model8" / "llara_model6_model8_predictions.csv",
+    "MRI": DMM_VALIDATION_ROOT / "outputs" / "mri_dense_validation" / "mri_model6_model8_predictions.csv",
+}
+
+SITE_QC_START_DATES = {
+    "Llara": "2022-01-01",
+    "MRI": "2021-07-01",
 }
 
 MODEL_NAME_MAP = {
@@ -182,6 +194,14 @@ WETNESS_FEATURE_WEIGHTS = {
 }
 
 
+def ordered_sites(values: pd.Series | list[str] | set[str]) -> list[str]:
+    order = ["Esdale", "Tarrawarra", "Nerrigundah", "Llara", "MRI"]
+    seen = {str(v) for v in values if pd.notna(v)}
+    out = [site for site in order if site in seen]
+    out.extend(sorted(seen.difference(out)))
+    return out
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--outdir", type=Path, default=DEFAULT_OUTDIR)
@@ -196,12 +216,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--train-date-fraction", type=float, default=0.33)
     parser.add_argument("--min-train-dates", type=int, default=3)
-    parser.add_argument(
-        "--write-representative-predictions",
-        action="store_true",
-        default=False,
-        help="Write one-probe strict-block predictions when budget 1 is explicitly requested.",
-    )
     return parser.parse_args(argv)
 
 
@@ -253,6 +267,9 @@ def load_site(site: str, path: Path) -> pd.DataFrame:
     raw["model_name"] = raw["model_name"].astype(str).map(MODEL_NAME_MAP).fillna(raw["model_name"].astype(str))
     raw = raw[raw["model_name"].isin(["model6_rf", "model8_process"])].copy()
     df = prepare_prediction_table(raw)
+    qc_start = SITE_QC_START_DATES.get(site)
+    if qc_start is not None:
+        df = df[df["date"] >= qc_start].copy()
     df["site"] = site
     df["base_model"] = df["model_name"]
     df["model_track"] = df["base_model"].map(MODEL_TRACK)
@@ -558,11 +575,9 @@ def evaluate_design(
     budget_label: str,
     budget: int,
     replicate: int,
-    representative: bool,
-) -> tuple[list[dict], list[dict], list[pd.DataFrame], list[dict]]:
+) -> tuple[list[dict], list[dict], list[dict]]:
     metrics_rows: list[dict] = []
     season_rows: list[dict] = []
-    prediction_frames: list[pd.DataFrame] = []
     fit_rows: list[dict] = []
 
     for base_model, model_df in site_df.groupby("base_model", observed=True):
@@ -607,34 +622,6 @@ def evaluate_design(
             s_metrics = metric_row(group["obs_sm_pct"], group["pred_sm_pct"].to_numpy(dtype=float))
             season_rows.append({**base_prefix, "season": str(season), **s_metrics})
 
-        if representative:
-            pred_frame = test[
-                [
-                    c
-                    for c in [
-                        "site",
-                        "base_model",
-                        "point_id",
-                        "date",
-                        "lon",
-                        "lat",
-                        "obs_sm_pct",
-                        "pred_sm_pct",
-                        "season",
-                    ]
-                    if c in test.columns
-                ]
-            ].copy()
-            pred_frame["block"] = block
-            pred_frame["selection_strategy"] = strategy
-            pred_frame["budget_label"] = budget_label
-            pred_frame["calibration_points"] = budget
-            pred_frame["replicate"] = replicate
-            pred_frame["method"] = "global"
-            pred_frame["pred_calibrated"] = pred_frame["pred_sm_pct"]
-            pred_frame["residual_calibrated"] = pred_frame["pred_calibrated"] - pred_frame["obs_sm_pct"]
-            prediction_frames.append(pred_frame)
-
         for method in CALIBRATION_METHODS:
             calibrator = fit_calibrator(train, method)
             pred = calibrator.predict(test)
@@ -665,35 +652,7 @@ def evaluate_design(
                 s_metrics = metric_row(group["obs_sm_pct"], group["pred_calibrated"].to_numpy(dtype=float))
                 season_rows.append({**metric_prefix, "season": str(season), **s_metrics})
 
-            if representative:
-                pred_frame = test[
-                    [
-                        c
-                        for c in [
-                            "site",
-                            "base_model",
-                            "point_id",
-                            "date",
-                            "lon",
-                            "lat",
-                            "obs_sm_pct",
-                            "pred_sm_pct",
-                            "season",
-                        ]
-                        if c in test.columns
-                    ]
-                ].copy()
-                pred_frame["block"] = block
-                pred_frame["selection_strategy"] = strategy
-                pred_frame["budget_label"] = budget_label
-                pred_frame["calibration_points"] = budget
-                pred_frame["replicate"] = replicate
-                pred_frame["method"] = method
-                pred_frame["pred_calibrated"] = pred
-                pred_frame["residual_calibrated"] = pred_frame["pred_calibrated"] - pred_frame["obs_sm_pct"]
-                prediction_frames.append(pred_frame)
-
-    return metrics_rows, season_rows, prediction_frames, fit_rows
+    return metrics_rows, season_rows, fit_rows
 
 
 def summarize_metrics(metrics: pd.DataFrame) -> pd.DataFrame:
@@ -799,14 +758,17 @@ def best_prior_guided_designs(summary: pd.DataFrame) -> pd.DataFrame:
     ].copy()
     if core.empty:
         return core
+    site_order = {site: i for i, site in enumerate(ordered_sites(core["site"]))}
+    core["site_order"] = core["site"].map(site_order).fillna(len(site_order)).astype(int)
     return (
         core.sort_values(
-            ["site", "base_model", "calibration_points", "nse_median", "rmse_gain_median"],
+            ["site_order", "base_model", "calibration_points", "nse_median", "rmse_gain_median"],
             ascending=[True, True, True, False, False],
         )
         .groupby(["site", "base_model", "budget_label", "calibration_points"], as_index=False, observed=True)
         .first()
-        .sort_values(["site", "base_model", "calibration_points"])
+        .sort_values(["site_order", "base_model", "calibration_points"])
+        .drop(columns=["site_order"], errors="ignore")
     )
 
 
@@ -828,14 +790,17 @@ def best_prior_guided_responsiveness(responsiveness: pd.DataFrame) -> pd.DataFra
     resp["mean_model_rmse_gain"] = (
         resp["statistical_rmse_gain_median"] + resp["process_rmse_gain_median"]
     ) / 2.0
+    site_order = {site: i for i, site in enumerate(ordered_sites(resp["site"]))}
+    resp["site_order"] = resp["site"].map(site_order).fillna(len(site_order)).astype(int)
     return (
         resp.sort_values(
-            ["site", "selection_strategy", "calibration_points", "mean_model_rmse_gain"],
+            ["site_order", "selection_strategy", "calibration_points", "mean_model_rmse_gain"],
             ascending=[True, True, True, False],
         )
         .groupby(["site", "selection_strategy", "budget_label", "calibration_points"], as_index=False, observed=True)
         .first()
-        .sort_values(["site", "selection_strategy", "calibration_points"])
+        .sort_values(["site_order", "selection_strategy", "calibration_points"])
+        .drop(columns=["site_order"], errors="ignore")
     )
 
 
@@ -850,7 +815,7 @@ def make_figures(outdir: Path, baseline: pd.DataFrame, summary: pd.DataFrame, re
 
     # Baseline skill by site/model.
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.2))
-    sites = list(baseline["site"].unique())
+    sites = ordered_sites(baseline["site"])
     x = np.arange(len(sites))
     width = 0.36
     for offset, model in [(-width / 2, "model6_rf"), (width / 2, "model8_process")]:
@@ -863,7 +828,7 @@ def make_figures(outdir: Path, baseline: pd.DataFrame, summary: pd.DataFrame, re
         ax.set_ylabel(ylab)
         ax.grid(axis="y", alpha=0.25)
     axes[0].legend(fontsize=8)
-    fig.suptitle("Uncalibrated global model skill by dense site")
+    fig.suptitle("Uncalibrated global model skill by validation site")
     fig.tight_layout()
     fig.savefig(figdir / "baseline_site_model_skill.png", dpi=180)
     plt.close(fig)
@@ -989,40 +954,6 @@ def make_figures(outdir: Path, baseline: pd.DataFrame, summary: pd.DataFrame, re
         fig.suptitle("Strict spatio-temporal transfer: random sparse sensors, NSE")
         fig.tight_layout()
         fig.savefig(figdir / "random_spatiotemporal_learning_curves_nse.png", dpi=180)
-        plt.close(fig)
-
-    # One-sensor selection strategy comparison: best method per model/strategy.
-    one = summary[
-        (summary["calibration_points"] == 1)
-        & (summary["block"] == "spatiotemporal_block")
-        & (summary["method"] != "global")
-    ].copy()
-    if not one.empty:
-        best = one.sort_values("rmse_median").groupby(["site", "selection_strategy", "base_model"], as_index=False).first()
-        fig, axes = plt.subplots(len(sites), 1, figsize=(10.5, max(3.1 * len(sites), 5)), sharex=True)
-        axes = np.atleast_1d(axes)
-        strategies = [s for s in SELECTION_STRATEGIES if s in set(best["selection_strategy"])]
-        x = np.arange(len(strategies))
-        width = 0.36
-        for ax, site in zip(axes, sites):
-            sub_site = best[best["site"] == site]
-            for offset, model in [(-width / 2, "model6_rf"), (width / 2, "model8_process")]:
-                vals = (
-                    sub_site[sub_site["base_model"] == model]
-                    .set_index("selection_strategy")
-                    .reindex(strategies)["rmse_gain_median"]
-                )
-                ax.bar(x + offset, vals, width=width, label=model)
-            ax.axhline(0, color="0.3", linewidth=0.8)
-            ax.set_title(site)
-            ax.set_ylabel("Best one-sensor\nRMSE gain (%)")
-            ax.grid(axis="y", alpha=0.25)
-        axes[-1].set_xticks(x)
-        axes[-1].set_xticklabels(strategies, rotation=25, ha="right")
-        axes[0].legend(fontsize=8)
-        fig.suptitle("One-sensor strategy comparison, strict spatio-temporal block")
-        fig.tight_layout()
-        fig.savefig(figdir / "one_sensor_strategy_comparison_rmse_gain.png", dpi=180)
         plt.close(fig)
 
     # Process-vs-statistical responsiveness.
@@ -1168,12 +1099,13 @@ def write_report(
         "than a normal model6 run."
     )
     figures_md = render_report_figures(out_path, report_figdir)
+    site_names = ordered_sites(site_summaries["site"]) if "site" in site_summaries.columns else []
+    site_list = ", ".join(site_names) if site_names else "the retained validation sites"
+    site_count_phrase = f"{len(site_names)}-site" if site_names else "multi-site"
 
-    body = f"""# Stage 2 local-spiking calibration: Esdale, Tarrawarra and Llara
+    body = f"""# Stage 2 local-spiking calibration: {site_count_phrase} validation set
 
-This report replaces the Phenode-based local calibration experiment. From here
-on, the original dense validation site is called **Esdale**, so each dense site
-has a unique name.
+Sites included in this run: {site_list}.
 
 The practical question is: if a landowner can afford a small cluster of
 soil-moisture sensors, can that local information budget improve property-scale
@@ -1215,21 +1147,28 @@ Calibration methods:
 
 {tarrawarra_note}
 
+Nerrigundah uses the same grid-cell support logic as Tarrawarra. MRI is a
+sparser continuous probe network, so its Stage 2 curves test local temporal
+transfer at fewer fixed supports rather than dense campaign spatial structure.
+
 ## Uncalibrated global model skill
 
 {markdown_table(baseline_report)}
 
 ## Headline inference
 
-- Under the strict prior-guided, non-proxy placement test, **model8 process is
-  usually more responsive than model6 RF at Esdale and Llara**, especially when
-  the selected supports represent landscape wet/dry structure or model
-  prediction extremes. This is the cleanest evidence so far that the process
-  model may provide a more stable base for sparse local information budgets.
+- Under the strict prior-guided, non-proxy placement test, the report now
+  compares all retained validation sites with model-ready support/date tables.
+  The cleanest manuscript reading should focus on whether calibration improves
+  held-out RMSE and NSE within each site, then compare process-vs-statistical
+  responsiveness as a secondary diagnostic.
 - Tarrawarra is different: both models improve strongly with sparse local
   calibration, but model6 often shows larger RMSE gains because its uncalibrated
   bias is very large. However, model8 generally remains the lower-RMSE model
   after calibration. Interpret this alongside the Tarrawarra SMIPS-zero caveat.
+- Nerrigundah and MRI should be treated as support-type sensitivity checks:
+  Nerrigundah is a Tarrawarra-like campaign grid, while MRI is a sparse
+  continuously monitored probe network.
 - Random placement is retained as an appendix comparator. It is not consistently
   enough under the strict block, which supports the practical idea of using
   defensible landscape knowledge rather than arbitrary sensor placement.
@@ -1305,7 +1244,6 @@ def main(argv: list[str] | None = None) -> int:
     selected_rows = []
     metrics_rows: list[dict] = []
     season_rows: list[dict] = []
-    representative_frames: list[pd.DataFrame] = []
     fit_rows: list[dict] = []
 
     for site, path in SITE_PATHS.items():
@@ -1336,15 +1274,14 @@ def main(argv: list[str] | None = None) -> int:
 
         n_eligible = int(point_summary["eligible"].sum())
         resolved_budgets: list[tuple[str, int]] = []
-        seen_budgets: set[tuple[str, int]] = set()
+        seen_budgets: set[int] = set()
         for spec in budget_specs:
             budget_label, budget = resolve_budget(spec, n_eligible)
             if budget <= 0:
                 continue
-            key = (budget_label, budget)
-            if key not in seen_budgets:
-                resolved_budgets.append(key)
-                seen_budgets.add(key)
+            if budget not in seen_budgets:
+                resolved_budgets.append((budget_label, budget))
+                seen_budgets.add(budget)
 
         for budget_label, budget in resolved_budgets:
             for strategy in SELECTION_STRATEGIES:
@@ -1364,13 +1301,7 @@ def main(argv: list[str] | None = None) -> int:
                         }
                     )
                     for block in BLOCKS:
-                        representative = (
-                            args.write_representative_predictions
-                            and budget == 1
-                            and rep == 0
-                            and block == "spatiotemporal_block"
-                        )
-                        m_rows, s_rows, p_frames, f_rows = evaluate_design(
+                        m_rows, s_rows, f_rows = evaluate_design(
                             df,
                             site,
                             selected,
@@ -1381,11 +1312,9 @@ def main(argv: list[str] | None = None) -> int:
                             budget_label,
                             budget,
                             rep,
-                            representative,
                         )
                         metrics_rows.extend(m_rows)
                         season_rows.extend(s_rows)
-                        representative_frames.extend(p_frames)
                         fit_rows.extend(f_rows)
 
     site_summaries = pd.DataFrame(site_summary_rows)
@@ -1407,11 +1336,6 @@ def main(argv: list[str] | None = None) -> int:
     baseline.to_csv(outdir / "global_baseline_metrics_by_site.csv", index=False)
     summary.to_csv(outdir / "local_calibration_summary.csv", index=False)
     responsiveness.to_csv(outdir / "process_vs_statistical_responsiveness.csv", index=False)
-    if representative_frames:
-        pd.concat(representative_frames, ignore_index=True, sort=False).to_csv(
-            outdir / "representative_one_sensor_spatiotemporal_predictions.csv",
-            index=False,
-        )
 
     make_figures(outdir, baseline, summary, responsiveness)
     copy_report_figures(outdir, args.report_figdir)

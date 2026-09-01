@@ -43,6 +43,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--bootstrap", type=int, default=1000)
     parser.add_argument("--limit-dates", type=int, default=None, help="Debug helper: only run the first N dates.")
     parser.add_argument("--force", action="store_true", help="Ignore cached model prediction tables.")
+    parser.add_argument("--run-label", default="tarrawarra", help="Prefix for run log and summary filenames.")
     parser.add_argument("--no-feature-sampling", action="store_true")
     parser.add_argument("--no-validation", action="store_true")
     parser.add_argument("--no-map-tifs", action="store_true")
@@ -53,6 +54,7 @@ def parse_args() -> argparse.Namespace:
 def _repo_imports(args: argparse.Namespace) -> None:
     sys.path.insert(0, str(DMM_VALIDATION_ROOT / "src"))
     sys.path.insert(0, str(args.dmm_repo))
+    os.chdir(args.dmm_repo)
 
 
 def _read_bbox(path: Path) -> tuple[float, float, float, float]:
@@ -329,6 +331,10 @@ def _run_validation(predictions: Path, outdir: Path, bootstrap: int) -> None:
 
 def main() -> int:
     args = parse_args()
+    args.observations = args.observations.resolve()
+    args.bbox_json = args.bbox_json.resolve()
+    args.outdir = args.outdir.resolve()
+    args.dmm_repo = args.dmm_repo.resolve()
     _repo_imports(args)
     args.outdir.mkdir(parents=True, exist_ok=True)
 
@@ -383,7 +389,9 @@ def main() -> int:
     valid.to_csv(valid_path, index=False)
 
     run_log = pd.concat([feature_log, log6, log8], ignore_index=True, sort=False)
-    run_log.to_csv(args.outdir / "tarrawarra_run_log.csv", index=False)
+    run_log_path = args.outdir / f"{args.run_label}_run_log.csv"
+    summary_path = args.outdir / f"{args.run_label}_comparison_summary.json"
+    run_log.to_csv(run_log_path, index=False)
 
     summary = {
         "observations": str(args.observations),
@@ -396,11 +404,11 @@ def main() -> int:
         "outputs": {
             "combined_predictions": str(combined_path),
             "valid_predictions": str(valid_path),
-            "run_log": str(args.outdir / "tarrawarra_run_log.csv"),
+            "run_log": str(run_log_path),
             "maps": str(args.outdir / "maps"),
         },
     }
-    (args.outdir / "tarrawarra_comparison_summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
 
     if not args.no_validation and not valid.empty:
         _run_validation(valid_path, args.outdir / "validation_report", args.bootstrap)

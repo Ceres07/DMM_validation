@@ -29,6 +29,7 @@
   {../../analyses/unified_dense_validation/figures/stage1/quality_surfaces/}
   {../../analyses/unified_dense_validation/figures/stage1/llara_native_prediction_maps/}
   {../../analyses/unified_dense_validation/figures/stage2_local_spiking/}
+  {../../analyses/unified_dense_validation/figures/model_space_pca/}
 }
 
 \newcommand{\nse}{\ensuremath{\mathrm{NSE}}}
@@ -57,7 +58,7 @@
 soil-moisture downscaling}
 \author{Dmitry [surname]\thanks{[affiliation; email]} \and
 Yasar Adeel Ansari\thanks{[affiliation; email]}}
-\date{Draft --- \today}
+\date{Draft --- 1 September 2026}
 
 \begin{document}
 
@@ -75,18 +76,20 @@ model-development evidence from the dense-site validation evidence.  Red
 
 \begin{abstract}
 \todo{Write after results are stabilised. Suggested structure: one sentence on
-the paddock-scale validation gap; one sentence describing Esdale, Tarrawarra and
-Llara; one sentence on the model-agnostic validation table; one sentence with
+the paddock-scale validation gap; one sentence describing Esdale, Tarrawarra,
+Nerrigundah, Llara and MRI; one sentence on the model-agnostic validation table; one sentence with
 headline model6/model8 skill and seasonal/wetness bias; one sentence on local
 calibration/spiking; one sentence on implications for deployment.}
 
 Root-zone soil-moisture products are increasingly evaluated against sparse
 station networks, but management decisions occur at sub-property scale where
 within-paddock redistribution by terrain, soil and antecedent wetness is
-critical.  Here we use three dense point datasets to test whether the final
-statistical and process-based models developed in the companion paper preserve
-paddock-scale soil-moisture patterns when treated as black-box gridded
-predictors.  Skill is summarised using Pearson correlation ($\pearsonr$),
+critical.  Here we use five retained model-ready validation datasets to test
+whether the final statistical and process-based models developed in the
+companion paper preserve paddock-scale soil-moisture patterns when treated as
+black-box gridded predictors.  The datasets span modern dense campaign points,
+historical high-density TDR grids and continuous probe networks.  Skill is
+summarised using Pearson correlation ($\pearsonr$),
 Nash--Sutcliffe efficiency (\nse{}), RMSE, \ubrmse{} and bias so that temporal
 association, error magnitude and mean-level offsets can be separated.
 \todo{Insert headline values and conclusion.}
@@ -187,17 +190,17 @@ calibration needs. \\
 
 \subsection{Sites and validation roles}\label{sec:sites}
 
-The analysis uses three dense datasets, each contributing a different kind of
-evidence (Table~\ref{tab:site-inventory}).  Esdale provides the strongest
-modern within-site terrain coverage but only autumn--winter dates.  Tarrawarra
-provides unusually dense spatial sampling through a full campaign year; because
-the raw TDR points are denser than the model grid, Tarrawarra is evaluated
-after aggregation to model grid-cell support.  \modelSix{} also has a known
-\smips{}-zero caveat for this historical period and should be read partly as a
-missing-coarse-anchor stress test.  Llara provides the strongest
-seasonal/temporal validation because the profile-mean probe record spans
-multiple years, but its point density is lower and the two paddocks should be
-interpreted separately.
+The analysis uses five retained model-ready validation datasets, each
+contributing a different kind of evidence (Table~\ref{tab:site-inventory}).
+Esdale provides the strongest modern within-site terrain coverage but only
+autumn--winter dates.  Tarrawarra and Nerrigundah provide unusually dense
+historical TDR campaign grids; because their raw points are denser than the
+model grid, both are evaluated after aggregation to model grid-cell support.
+They also carry the expected pre-\smips{} coarse-anchor caveat for
+\modelSix{}.  Llara provides the strongest multi-year seasonal validation with
+32 profile-mean probes across two paddocks.  MRI adds a sparser but longer
+continuous probe network, useful for testing whether local calibration
+behaviour holds when the spatial support is less dense.
 
 \begin{table}[htbp]
 \centering
@@ -206,8 +209,8 @@ current analysis cache and should be checked against the final model-agnostic
 tables before submission.}
 \label{tab:site-inventory}
 \scriptsize
-\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{1.5cm}
-                              >{\raggedright\arraybackslash}p{2.45cm}
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{1.75cm}
+                              >{\raggedright\arraybackslash}p{2.20cm}
                               rr
                               >{\raggedright\arraybackslash}p{2.35cm}
                               >{\raggedright\arraybackslash}p{1.8cm}
@@ -224,10 +227,20 @@ Tarrawarra & Extreme spatial-density stress test & 178 & 19
   & Spring, summer, autumn, winter
   & 3610 raw points aggregated to model grid cells by date; \modelSix{} is
   affected by the historical coarse-anchor caveat. \\
-Llara & Seasonal/temporal microscope & 32 & 955
-  & 2021-10-19--2024-06-30
+Nerrigundah & Independent historical grid test & 128 & 12
+  & 1997-08-27--1997-09-22
+  & Winter, spring
+  & Tarrawarra-like 15\,cm TDR campaign aggregated to model grid cells by date. \\
+Llara & Seasonal/temporal microscope & 32 & 911
+  & 2022-01-01--2024-06-30
   & Spring, summer, autumn, winter
-  & Profile-mean probes across WE and WW paddocks; strongest seasonal record. \\
+  & Profile-mean probes across WE and WW paddocks; trimmed from January~2022 for
+  probe-establishment QC. \\
+MRI & Sparse continuous-probe transfer & 18 & 1799
+  & 2021-07-01--2026-06-03
+  & Spring, summer, autumn, winter
+  & Mulloon Rehydration Initiative profile-mean probes; trimmed from July~2021
+  for probe-establishment QC. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -235,11 +248,12 @@ Llara & Seasonal/temporal microscope & 32 & 955
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\textwidth]{dem_points_overlay_gallery.png}
-\caption{Dense validation site terrain context.  Esdale, Llara WE and Llara WW
-use the 30\,m Copernicus/model terrain grid; Tarrawarra uses the converted
-5\,m campaign DEM.  Red points are soil-moisture validation supports: probe
-locations for Esdale and Llara, and aggregated model-grid-cell centroids for
-Tarrawarra.}
+\caption{Available validation-site terrain context.  Esdale, Llara WE and
+Llara WW use the 30\,m Copernicus/model terrain grid; Tarrawarra uses the
+converted 5\,m campaign DEM.  Red points are soil-moisture validation supports:
+probe locations for Esdale and Llara, and aggregated model-grid-cell centroids
+for Tarrawarra.  \todo{Add Nerrigundah and MRI DEM panels once matching DEM
+overlay rasters are staged.}}
 \label{fig:dem-context}
 \end{figure}
 
@@ -251,21 +265,21 @@ the original model development.  The validation target is therefore treated as
 volumetric soil moisture percentage at the best available site-specific support,
 not as a perfectly interchangeable sensor quantity.
 
-Llara measurements are obtained from continuously recording in-situ probes that
-measure through a profile to approximately 1.60\,m depth.  The validation uses
-the profile-mean depth from these sensors so that each timestamp contributes a
-single local soil-moisture estimate.  Esdale measurements are handheld TDR
-probe readings to approximately 10\,cm depth.  Tarrawarra measurements are TDR
-probe readings to approximately 15\,cm depth.
+Llara and MRI measurements are obtained from continuously recording in-situ
+probes.  The validation uses a profile-mean depth summary so that each
+timestamp contributes a single local soil-moisture estimate.  Esdale
+measurements are handheld TDR probe readings to approximately 10\,cm depth.
+Tarrawarra and Nerrigundah measurements are TDR campaign readings to
+approximately 15\,cm depth.
 
-Tarrawarra also requires explicit spatial-support harmonisation.  The campaign
-sampling is much denser than the model prediction grid, so scoring raw
-probe observations would over-weight sub-pixel variability that neither a
-30\,m statistical model nor a 30\,m process model can resolve.  For Tarrawarra,
-validation is therefore performed after aggregating observations to the model
-support scale: within each model/date/grid-cell combination, observed TDR soil
-moisture is averaged and the prediction is sampled once from the corresponding
-raster cell.  Residual sub-pixel variation is treated as an
+Tarrawarra and Nerrigundah also require explicit spatial-support
+harmonisation.  Their campaign sampling is much denser than the model
+prediction grid, so scoring raw probe observations would over-weight sub-pixel
+variability that neither a 30\,m statistical model nor a 30\,m process model
+can resolve.  Validation is therefore performed after aggregating observations
+to the model support scale: within each model/date/grid-cell combination,
+observed TDR soil moisture is averaged and the prediction is sampled once from
+the corresponding raster cell.  Residual sub-pixel variation is treated as an
 observational/support mismatch rather than direct model error.  This provides
 an additional diagnostic: grid cells with high within-cell TDR variance mark
 locations where no 30\,m model should be expected to score perfectly unless it
@@ -275,18 +289,18 @@ explicitly represents sub-pixel structure.
 
 For each site and observation date, model predictions are generated or sampled
 from cached gridded products and extracted at the relevant observation support:
-probe coordinates for Esdale and Llara, and model grid-cell supports for
-Tarrawarra after aggregation.
+probe coordinates for Esdale, Llara and MRI, and model grid-cell supports for
+Tarrawarra and Nerrigundah after aggregation.
 The validation protocol is deliberately model agnostic: after prediction,
 each model is represented only by a table of support/date predictions and
 associated model-input strata.  This allows \modelSix{} and \modelEight{} to be
 compared without relying on either model's internal representation.
 
-\caution{For Tarrawarra, the current \modelSix{} prediction table has a
-\smips{}-zero caveat because historical SMIPS coverage was unavailable or
-returned zero-valued inputs for the model run.  Do not interpret Tarrawarra
-\modelSix{} skill as a normal operational model6 result until this is resolved
-or explicitly framed as a coarse-anchor ablation.}
+\caution{For Tarrawarra and Nerrigundah, the current \modelSix{} prediction
+tables have a \smips{}-zero/coarse-anchor caveat because historical SMIPS
+coverage was unavailable or returned zero-valued inputs for the model runs.
+Do not interpret their \modelSix{} skill as normal operational model6 results
+unless this is resolved or explicitly framed as a coarse-anchor ablation.}
 
 \section{Model-agnostic validation protocol}\label{sec:protocol}
 
@@ -413,27 +427,27 @@ questions.}
 \label{fig:overall-skill}
 \end{figure}
 
-The headline result is that dense-site transfer remains modest at this scale.
-Across the three sites, pooled \nse{} is near zero for most site/model
-combinations despite positive Pearson correlations, meaning that the models
-often track some spatial or temporal ordering without yet reproducing the full
-observed magnitude and offset.  Esdale has the lowest RMSE, approximately
-6.45--6.48 volumetric percentage points, but only weak-to-moderate Pearson
-correlation ($\pearsonr \approx 0.24$ for \modelSix{} and $0.46$ for
-\modelEight{}).  Error magnitude is larger elsewhere: Llara is approximately
-14 percentage points RMSE for both models, and Tarrawarra ranges from
-9.29 percentage points for \modelEight{} to 14.40 for \modelSix{} after
-support aggregation.  \modelEight{} is therefore the clearer Tarrawarra
-performer in this cache, while the Llara comparison separates association
-(\modelEight{} higher $\pearsonr$) from bias and total error (\modelSix{}
-slightly lower RMSE and smaller dry bias).
+The headline result is that validation-site transfer remains modest at this
+scale.  Across the five retained datasets, pooled \nse{} is near zero for most
+site/model combinations despite positive Pearson correlations, meaning that
+the models often track some spatial or temporal ordering without yet
+reproducing the full observed magnitude and offset.  Esdale and Nerrigundah
+have the lowest RMSE, approximately 6--6.5 volumetric percentage points, but
+Nerrigundah has weak correlation for both models.  Tarrawarra shows the clearest
+advantage for \modelEight{} after grid-cell support aggregation, while Llara
+and MRI show stronger temporal association for \modelEight{} but only modest
+differences in total RMSE.  The historical campaign sites remain especially
+useful as stress tests of spatial structure, whereas Llara and MRI are the
+stronger tests of continuous temporal behaviour.
 
 \begin{table}[htbp]
 \centering
 \small
 \caption{Headline independent validation metrics from the current unified
-analysis cache.  For Tarrawarra, $n$ is the number of model/date/grid-cell
-supports after aggregation, not the number of raw TDR observations.}
+analysis cache.  For Tarrawarra and Nerrigundah, $n$ is the number of
+model/date/grid-cell supports after aggregation, not the number of raw TDR
+observations.  Llara and MRI are QC-trimmed to 2022-01-01 and 2021-07-01,
+respectively.}
 \label{tab:headline-metrics}
 \begin{tabularx}{\textwidth}{llrrrrrX}
 \toprule
@@ -447,10 +461,18 @@ Tarrawarra & \modelSix{} & 2154 & -1.219 & 0.398 & 14.402 & 9.093
   & $-11.169$; strong dry bias, interpreted with the \smips{}-zero caveat. \\
 Tarrawarra & \modelEight{} & 2154 & 0.077 & 0.853 & 9.291 & 6.958
   & $-6.157$; strongest Tarrawarra association after support aggregation. \\
-Llara & \modelSix{} & 29247 & 0.036 & 0.267 & 13.927 & 13.744
-  & $-2.249$; slightly better error/bias than \modelEight{} overall. \\
-Llara & \modelEight{} & 29247 & -0.017 & 0.453 & 14.306 & 12.855
-  & $-6.278$; stronger association but larger dry bias. \\
+Nerrigundah & \modelSix{} & 1536 & -0.079 & 0.130 & 6.341 & 6.054
+  & $-1.887$; low RMSE but weak association under the historical-grid test. \\
+Nerrigundah & \modelEight{} & 1536 & -0.050 & 0.102 & 6.254 & 6.078
+  & $1.476$; slightly lower RMSE but still weak association. \\
+Llara & \modelSix{} & 28390 & 0.039 & 0.274 & 13.777 & 13.582
+  & $-2.308$; slightly better error/bias than \modelEight{} overall. \\
+Llara & \modelEight{} & 28390 & -0.017 & 0.463 & 14.172 & 12.677
+  & $-6.335$; stronger association but larger dry bias. \\
+MRI & \modelSix{} & 29046 & 0.006 & 0.545 & 9.972 & 8.413
+  & $-5.354$; moderate temporal association with dry bias. \\
+MRI & \modelEight{} & 29046 & 0.024 & 0.600 & 9.882 & 8.157
+  & $-5.577$; slightly better efficiency/correlation, similar dry bias. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -481,7 +503,7 @@ make temporal drift and wet/dry compression visually apparent.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{predicted_vs_observed_timeseries_three_sites.png}
+\includegraphics[width=\textwidth]{predicted_vs_observed_timeseries_validation_sites.png}
 \caption{Observed and predicted soil-moisture time series by site.  Values are
 spatial means over available validation points for each date.  \todo{Check
 whether Llara should be shown as WE/WW paddocks separately in the final
@@ -499,13 +521,15 @@ trafficability, drought stress and paddock management decisions.
 Seasonal residuals show that mean bias is not stable through time
 (Fig.~\ref{fig:seasonal-bias}).  Esdale is limited to autumn--winter, where
 \modelSix{} changes from a small autumn wet bias to a winter dry bias, while
-\modelEight{} remains wetter than observed in both seasons.  Llara shows the
-clearest multi-year seasonal diagnostic: \modelEight{} has stronger dry bias in
-all seasons, especially spring, whereas \modelSix{} is closer to zero in autumn
-and winter but still dry-biased in spring.  Tarrawarra is dominated by the
-\modelSix{} historical coarse-anchor caveat; \modelSix{} is strongly dry in
-spring, autumn and winter but close to neutral in summer, while \modelEight{}
-is still dry in spring, autumn and winter and wet-biased in summer.
+\modelEight{} remains wetter than observed in both seasons.  Tarrawarra is
+dominated by the \modelSix{} historical coarse-anchor caveat; \modelSix{} is
+strongly dry in spring, autumn and winter but close to neutral in summer, while
+\modelEight{} is still dry in spring, autumn and winter and wet-biased in
+summer.  Nerrigundah provides only winter--spring campaign dates, so it is best
+read as an independent historical grid check rather than a full seasonal
+diagnostic.  Llara and MRI provide the strongest multi-year seasonal tests;
+both show persistent dry bias in the continuous-probe records, especially for
+\modelEight{}.
 
 \begin{figure}[htbp]
 \centering
@@ -520,10 +544,10 @@ coverage.}}
 Wetness-state residuals indicate a general compression of the observed
 moisture range (Fig.~\ref{fig:wetness-bias}).  The models tend to overpredict
 the driest observed quartile and underpredict the wettest observed quartile,
-with the effect particularly visible at Llara and Tarrawarra.  This pattern is
-important because a map that gets the mid-range approximately right may still
-misrepresent the very wet and very dry paddock positions that often drive
-management decisions.
+with the effect particularly visible in the longer probe records and the
+historical campaign grids.  This pattern is important because a map that gets
+the mid-range approximately right may still misrepresent the very wet and very
+dry paddock positions that often drive management decisions.
 
 \begin{figure}[htbp]
 \centering
@@ -540,22 +564,60 @@ exceptions.}}
 \subsection{Terrain and model-input stratification of error}
 \label{sec:stage1-terrain}
 
-Dense validation allows error to be stratified by the same model inputs that
-drive the downscaling field, including elevation, slope, TWI, HLI,
+The validation supports allow error to be stratified by the same model inputs
+that drive the downscaling field, including elevation, slope, TWI, HLI,
 accumulation, aspect components, SLGA soil properties and antecedent
 meteorological summaries.  The main text should show only the most notable
 strata; complete strata tables belong in the supplement.
 
-\placeholderbox{Planned terrain-stratification figure}{
-Recommended final figure: rows = site, columns = model, colour = bias or RMSE
-contrast between low/mid/high strata.  Show only the top 2--3 variables per
-site/model ranked by combined bias and RMSE range.  Source tables:
-\texttt{metrics\_by\_terrain\_strata.csv} and
-\texttt{notable\_terrain\_error\_strata.csv}.}
+To keep the terrain-space story simple, the manuscript version emphasises
+support-level RMSE rather than showing both signed bias and RMSE in the same
+section.  Each point in Figs.~\ref{fig:pca-static-global-rmse} and
+\ref{fig:pca-static-site-rmse} is a validation support: an Esdale, Llara or MRI
+probe location, or a Tarrawarra/Nerrigundah grid-cell support after campaign
+aggregation.  The colour is the RMSE for that support pooled across available
+dates, shown separately for \modelSix{} and \modelEight{}.
 
-\todo{Write one paragraph per site: Esdale terrain signal, Tarrawarra
-terrain/spatial signal, Llara seasonal/field signal.  Avoid overinterpreting
-variables that are collinear or dynamic strata masquerading as terrain.}
+The global-scaled PCA asks whether the validation sites occupy different
+absolute terrain--soil settings (Fig.~\ref{fig:pca-static-global-rmse}).  This
+view preserves site means, so between-site separation should be interpreted as
+environmental transfer distance.  High-RMSE clusters in this plot therefore
+suggest that a model is failing in particular absolute terrain--soil
+environments, but they may also reflect site-level offsets, sensor depth
+differences or historical coarse-anchor caveats.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{static_terrain_soil_global_rmse_pca.png}
+\caption{Global-scaled static terrain--soil PCA with supports coloured by
+support-level RMSE.  PCA inputs are elevation, slope, aspect components, TWI,
+HLI, accumulation and SLGA soil properties.  The same support coordinates are
+shown in both model panels; only the RMSE colouring differs.}
+\label{fig:pca-static-global-rmse}
+\end{figure}
+
+The site-standardised PCA removes each site's mean terrain--soil offset before
+fitting the PCA (Fig.~\ref{fig:pca-static-site-rmse}).  This is the cleaner
+view for asking whether high-error supports occupy analogous within-site
+positions, for example local ridges, hollows, high-HLI positions or soil-texture
+extremes.  This view should be interpreted as a diagnostic map of terrain
+failure modes, not as a causal attribution model; the PCA axes are rotations of
+correlated covariates.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\textwidth]{static_terrain_soil_site_standardised_rmse_pca.png}
+\caption{Site-standardised static terrain--soil PCA with supports coloured by
+support-level RMSE.  Within each site, static covariates are z-scored before
+PCA, so local terrain contrasts are comparable across sites even when the
+absolute site environments differ.}
+\label{fig:pca-static-site-rmse}
+\end{figure}
+
+\todo{After final figure choice, write one compact paragraph naming the most
+visible high-RMSE terrain-space regions and whether those regions are shared by
+\modelSix{} and \modelEight{}.  Keep signed-bias PCA as supplementary unless it
+adds a distinct manuscript claim.}
 
 \subsection{Spatial clustering of prediction quality}
 \label{sec:stage1-spatial}
@@ -612,13 +674,13 @@ The current calibration layers are:
   covariates.
 \end{enumerate}
 
-Point budgets are one, three, five, ten, 25\,\%, 50\,\% and all eligible local
+Point budgets are three, five, ten, 25\,\%, 50\,\% and all eligible local
 calibration points.  Validation is performed on held-out points and dates, with
 the strict spatial+temporal block treated as the primary transfer estimate.
 
 \todo{State exactly which selection strategies are retained in the final
-protocol.  Candidate final set: random, field-knowledge wet/dry proxy,
-global-prediction extremes, terrain-representative.}
+protocol.  Current set: random, landscape wet/dry prior, global-prediction
+extremes, and the field-knowledge wet/dry proxy upper bound.}
 
 \subsection{Learning curves}\label{sec:stage2-learning}
 
@@ -638,7 +700,7 @@ ineffective under the strict block.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{prior_guided_spatiotemporal_learning_curves_rmse_gain.png}
+\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{prior_guided_spatiotemporal_learning_curves_rmse_gain.png}
 \caption{Prior-guided sparse local-calibration learning curves under strict
 spatial+temporal blocking.  Each point is the best deployable non-random,
 non-proxy strategy/method combination for that site, model and local point
@@ -648,7 +710,7 @@ budget.  Positive values indicate lower RMSE after calibration.}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{prior_guided_spatiotemporal_learning_curves_nse.png}
+\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{prior_guided_spatiotemporal_learning_curves_nse.png}
 \caption{Prior-guided sparse local-calibration learning curves expressed as
 held-out \nse{} under strict spatial+temporal blocking.  Each point is selected
 using the same deployable non-random, non-proxy strategy set as
@@ -669,13 +731,14 @@ local supports are needed before strict held-out \nse{} reaches approximately
 0.2 or 0.3?  Table~\ref{tab:min-budget} uses the current strict
 spatial+temporal block and excludes the
 \texttt{field\_knowledge\_wetdry\_proxy} upper-bound strategy because that
-proxy uses observed chronic wet/dry behaviour.  The result is sobering: random
-and simple landscape/model-prior calibration rarely reaches \nse{} = 0.3 in
-this cache, except for Tarrawarra \modelEight{}.  Reaching even \nse{} = 0.2
-generally requires multiple local supports for Esdale and Llara, so the
-practical sensor-placement story should emphasise parsimonious but defensible
-local information budgets rather than assuming a single sensor can identify all
-within-property failure modes.
+proxy uses observed chronic wet/dry behaviour.  The result is mixed rather than
+uniformly optimistic.  Tarrawarra \modelEight{} responds strongly with three
+landscape-prior supports, MRI reaches \nse{} = 0.3 with five to nine supports,
+and Nerrigundah reaches \nse{} = 0.2 but not 0.3.  Esdale \modelSix{} and both
+Llara models remain below 0.2 under the deployable prior-guided designs in this
+cache.  The practical sensor-placement story should therefore emphasise
+parsimonious but defensible local information budgets, not the assumption that
+any small sensor set will fix within-property failure modes.
 
 \begin{table}[htbp]
 \centering
@@ -696,18 +759,32 @@ Not reached; same best design (\nse{} = 0.160). \\
 Esdale & \modelEight{} &
 19 supports, landscape wet/dry prior + residual ridge (\nse{} = 0.237). &
 Not reached; best \nse{} = 0.237. \\
-Llara & \modelSix{} &
-16 supports, global-prediction extremes + seasonal offset (\nse{} = 0.205). &
-Not reached; best \nse{} = 0.205. \\
-Llara & \modelEight{} &
-16 supports, global-prediction extremes + affine correction (\nse{} = 0.255). &
-Not reached; best \nse{} = 0.255. \\
 Tarrawarra & \modelSix{} &
 168 supports, global-prediction extremes + residual ridge (\nse{} = 0.263). &
 Not reached; best \nse{} = 0.263. \\
 Tarrawarra & \modelEight{} &
-1 support, landscape wet/dry prior + affine correction (\nse{} = 0.460). &
-1 support, landscape wet/dry prior + affine correction (\nse{} = 0.460). \\
+3 supports, landscape wet/dry prior + affine correction (\nse{} = 0.689). &
+3 supports, landscape wet/dry prior + affine correction (\nse{} = 0.689). \\
+Nerrigundah & \modelSix{} &
+64 supports, landscape wet/dry prior + residual ridge (\nse{} = 0.222). &
+Not reached; best \nse{} = 0.222. \\
+Nerrigundah & \modelEight{} &
+10 supports, landscape wet/dry prior + residual ridge (\nse{} = 0.211). &
+Not reached; best \nse{} = 0.211. \\
+Llara & \modelSix{} &
+Not reached; best 16 supports, global-prediction extremes + bias offset
+(\nse{} = 0.169). &
+Not reached; same best design (\nse{} = 0.169). \\
+Llara & \modelEight{} &
+Not reached; best 16 supports, global-prediction extremes + bias offset
+(\nse{} = 0.140). &
+Not reached; same best design (\nse{} = 0.140). \\
+MRI & \modelSix{} &
+3 supports, global-prediction extremes + bias offset (\nse{} = 0.246). &
+9 supports, global-prediction extremes + residual ridge (\nse{} = 0.495). \\
+MRI & \modelEight{} &
+3 supports, global-prediction extremes + bias offset (\nse{} = 0.279). &
+5 supports, global-prediction extremes + residual ridge (\nse{} = 0.426). \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -720,18 +797,16 @@ statistical downscaler may already encode nonlinear terrain and soil
 relationships learned from the station network, but it may be brittle outside
 the training distribution.  A process model may have simpler temporal dynamics
 and fewer degrees of freedom, but a local layer may correct its site-level
-state more cleanly.  Dense datasets allow this difference to be measured as
-the marginal gain from the same sparse local information.
+state more cleanly.  The validation datasets allow this difference to be
+measured as the marginal gain from the same sparse local information.
 
-In the current strict prior-guided experiment, \modelEight{} generally responds
-better than \modelSix{} at Esdale and Llara, whereas Tarrawarra is more mixed
-(Fig.~\ref{fig:process-response}).  One plausible interpretation is that the
-process model provides a smoother local baseline whose remaining bias can be
-corrected with a small number of local supports, especially where the site is
-outside the station-network distribution but still physically coherent.  At
-Tarrawarra, however, \modelSix{} begins with a large dry bias linked to the
-historical coarse-anchor problem; simple local calibration can remove part of
-that large offset, so the statistical model can show large RMSE gains even when
+In the current strict prior-guided experiment, process-vs-statistical
+responsiveness is site dependent rather than a single model ranking
+(Fig.~\ref{fig:process-response}).  \modelEight{} often gains more than
+\modelSix{} at Esdale and Llara, while Nerrigundah tends to favour larger gains
+for \modelSix{} and MRI is mixed.  Tarrawarra remains a special case:
+\modelSix{} begins with a large dry bias linked to the historical coarse-anchor
+problem, so simple local calibration can remove part of that offset even when
 \modelEight{} remains the lower-error model after calibration.  A clearer
 mechanistic interpretation will require comparing the calibration supports
 against model-input diagnostics such as TWI, HLI, elevation, soil texture,
@@ -740,7 +815,7 @@ state variables.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{prior_guided_process_vs_statistical_responsiveness.png}
+\includegraphics[width=0.9\textwidth,height=0.82\textheight,keepaspectratio]{prior_guided_process_vs_statistical_responsiveness.png}
 \caption{Process-vs-statistical local calibration responsiveness under
 deployable prior-guided placement.  Positive values indicate that
 \modelEight{} gained more RMSE improvement than \modelSix{} from the same
@@ -787,18 +862,20 @@ that improve model training from data that improve independent validation.}
 \begin{itemize}
 \item Esdale has strong spatial/terrain coverage but short autumn--winter
 coverage.
+\item Tarrawarra and Nerrigundah have exceptional raw point density; validation
+now aggregates those points to model grid cells by date before scoring. Their
+current \modelSix{} \smips{}-zero/coarse-anchor caveat prevents direct
+interpretation as operational \modelSix{} performance. High within-cell TDR
+variance should be treated as support mismatch unless future models explicitly
+represent sub-pixel structure.
 \item Llara has strong temporal/seasonal coverage but only 32 probes across
 two paddocks.
-\item Tarrawarra has exceptional raw point density; validation now aggregates
-those points to model grid cells by date before scoring. The current
-\modelSix{} \smips{}-zero caveat prevents direct interpretation as an
-operational \modelSix{} result. High within-cell TDR variance should be treated
-as support mismatch unless future models explicitly represent sub-pixel
-structure.
+\item MRI has a long continuous record but only 18 retained probe supports, so
+its local-calibration results are sensitive to sparse-network geometry.
 \item Soil-moisture depth definitions and profile integration differ across
 datasets and must be documented carefully.
-\item Dense datasets remain limited in climate and soil coverage relative to
-the intended national product.
+\item The validation datasets remain limited in climate and soil coverage
+relative to the intended national product.
 \item \nse{} can be unstable when observed variance is small; Pearson
 $\pearsonr$, RMSE, \ubrmse{} and bias must be interpreted alongside it.
 \item Local calibration experiments are deployment sensitivity analyses, not
@@ -824,7 +901,8 @@ and any restrictions before submission.}
 \section*{Supplementary material plan}
 
 \begin{itemize}
-\item Full model-agnostic prediction tables for Esdale, Tarrawarra and Llara.
+\item Full model-agnostic prediction tables for Esdale, Tarrawarra,
+Nerrigundah, Llara and MRI.
 \item Full per-site/model metric tables.
 \item Full terrain/model-input strata tables.
 \item Full paired support/date model comparison tables.
@@ -851,7 +929,7 @@ improves RMSE more reliably than \nse{}, and Esdale remains especially difficult
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{random_spatiotemporal_learning_curves_rmse_gain.png}
+\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{random_spatiotemporal_learning_curves_rmse_gain.png}
 \caption{Appendix random-placement sparse local-calibration learning curves
 under strict spatial+temporal blocking.  Positive values indicate lower RMSE
 after calibration.}
@@ -860,7 +938,7 @@ after calibration.}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\textwidth]{random_spatiotemporal_learning_curves_nse.png}
+\includegraphics[width=\textwidth,height=0.82\textheight,keepaspectratio]{random_spatiotemporal_learning_curves_nse.png}
 \caption{Appendix random-placement sparse local-calibration learning curves
 expressed as held-out \nse{} under strict spatial+temporal blocking.}
 \label{fig:app-random-nse}
@@ -868,7 +946,7 @@ expressed as held-out \nse{} under strict spatial+temporal blocking.}
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.9\textwidth]{process_vs_statistical_responsiveness_random.png}
+\includegraphics[width=0.9\textwidth,height=0.82\textheight,keepaspectratio]{process_vs_statistical_responsiveness_random.png}
 \caption{Appendix process-vs-statistical local calibration responsiveness under
 random placement.  Positive values indicate that \modelEight{} gained more RMSE
 improvement than \modelSix{} from the same random sparse local information

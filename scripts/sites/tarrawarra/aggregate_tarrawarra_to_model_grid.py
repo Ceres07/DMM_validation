@@ -67,6 +67,11 @@ def parse_args() -> argparse.Namespace:
         default="model6_rf,model8_process",
         help="Comma-separated model labels matching map filenames.",
     )
+    parser.add_argument(
+        "--site-prefix",
+        default="tarrawarra",
+        help="Prefix used when naming aggregated model-grid validation points.",
+    )
     return parser.parse_args()
 
 
@@ -74,7 +79,7 @@ def model_raster_path(map_dir: Path, model_name: str, day: str) -> Path:
     return map_dir / f"{model_name}_{day}.tif"
 
 
-def attach_grid_indices(group: pd.DataFrame, raster_path: Path) -> pd.DataFrame:
+def attach_grid_indices(group: pd.DataFrame, raster_path: Path, site_prefix: str) -> pd.DataFrame:
     import rasterio
     from pyproj import Transformer
 
@@ -107,7 +112,7 @@ def attach_grid_indices(group: pd.DataFrame, raster_path: Path) -> pd.DataFrame:
 
         out["grid_row"] = rows
         out["grid_col"] = cols
-        out["grid_cell_id"] = [f"tarrawarra_grid_r{r:03d}_c{c:03d}" for r, c in zip(rows, cols)]
+        out["grid_cell_id"] = [f"{site_prefix}_grid_r{r:03d}_c{c:03d}" for r, c in zip(rows, cols)]
         out["grid_x"] = center_x
         out["grid_y"] = center_y
         out["grid_lon"] = center_lon
@@ -147,7 +152,7 @@ def aggregate_group(group: pd.DataFrame) -> pd.Series:
     return pd.Series(row)
 
 
-def aggregate(df: pd.DataFrame, map_dir: Path, models: list[str]) -> tuple[pd.DataFrame, dict]:
+def aggregate(df: pd.DataFrame, map_dir: Path, models: list[str], site_prefix: str) -> tuple[pd.DataFrame, dict]:
     work = df[df["model_name"].astype(str).isin(models)].copy()
     work["date"] = pd.to_datetime(work["date"]).dt.date.astype(str)
     required = {"model_name", "date", "point_id", "lon", "lat", "obs_sm_pct"}
@@ -159,7 +164,7 @@ def aggregate(df: pd.DataFrame, map_dir: Path, models: list[str]) -> tuple[pd.Da
     logs = []
     for (model_name, day), group in work.groupby(["model_name", "date"], sort=True):
         raster_path = model_raster_path(map_dir, str(model_name), str(day))
-        gridded = attach_grid_indices(group, raster_path)
+        gridded = attach_grid_indices(group, raster_path, site_prefix)
         gridded = gridded.dropna(subset=["raster_pred_sm_pct", "grid_cell_id", "obs_sm_pct"])
         if gridded.empty:
             logs.append(
@@ -214,6 +219,7 @@ def aggregate(df: pd.DataFrame, map_dir: Path, models: list[str]) -> tuple[pd.Da
     summary = {
         "input_rows": int(len(work)),
         "output_rows": int(len(out)),
+        "site_prefix": site_prefix,
         "models": sorted(work["model_name"].astype(str).unique()),
         "dates": int(work["date"].nunique()),
         "raw_unique_points": int(work["point_id"].nunique()),
@@ -230,7 +236,7 @@ def main() -> int:
     args = parse_args()
     models = [m.strip() for m in args.models.split(",") if m.strip()]
     df = pd.read_csv(args.input)
-    out, summary = aggregate(df, args.map_dir, models)
+    out, summary = aggregate(df, args.map_dir, models, args.site_prefix)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(args.output, index=False)
     args.summary.write_text(json.dumps(summary, indent=2), encoding="utf-8")
