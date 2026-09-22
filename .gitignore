@@ -21,6 +21,12 @@ data/
 *.pkl
 *.parquet
 
+# ignore LaTeX build junk 
+reports/manuscripts/dense_validation_manuscript/**
+!reports/manuscripts/dense_validation_manuscript/**/
+!reports/manuscripts/dense_validation_manuscript/**/*.tex
+!reports/manuscripts/dense_validation_manuscript/**/*.pdf
+
 # macOS sidecar/resource-fork files
 ._* 
 .DS_Store
