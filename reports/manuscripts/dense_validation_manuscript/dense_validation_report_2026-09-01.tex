@@ -56,7 +56,7 @@
 
 \title{Dense paddock-scale validation of statistical and process-based
 soil-moisture downscaling}
-\author{Dmitry [surname]\thanks{[affiliation; email]} \and
+\author{Dmitry Grishin\thanks{[affiliation; email]} \and
 Yasar Adeel Ansari\thanks{[affiliation; email]}}
 \date{Draft --- 1 September 2026}
 
@@ -75,24 +75,35 @@ model-development evidence from the dense-site validation evidence.  Red
 \end{center}
 
 \begin{abstract}
-\todo{Write after results are stabilised. Suggested structure: one sentence on
-the paddock-scale validation gap; one sentence describing Esdale, Tarrawarra,
-Nerrigundah, Llara and MRI; one sentence on the model-agnostic validation table; one sentence with
-headline model6/model8 skill and seasonal/wetness bias; one sentence on local
-calibration/spiking; one sentence on implications for deployment.}
 
-Root-zone soil-moisture products are increasingly evaluated against sparse
+Root-zone soil-moisture products are frequently evaluated against sparse
 station networks, but management decisions occur at sub-property scale where
 within-paddock redistribution by terrain, soil and antecedent wetness is
-critical.  Here we use five retained model-ready validation datasets to test
+critical. Here we use five independent validation datasets in two stages: firstly, to test
 whether the final statistical and process-based models developed in the
-companion paper preserve paddock-scale soil-moisture patterns when treated as
-black-box gridded predictors.  The datasets span modern dense campaign points,
+companion paper preserve paddock-scale soil-moisture patterns. Secondly, 
+local calibration sensitivity is tested across the five sites to determine 
+the minimum ground-truth sensor deployment to achieve good (NSE > 0.3) local model 
+performance. Both models are evaluated on a model-agnostic terrain and climate covariate 
+table to allow for direct comparison of model performance. 
+
+The datasets span modern dense campaign points,
 historical high-density TDR grids and continuous probe networks.  Skill is
 summarised using Pearson correlation ($\pearsonr$),
 Nash--Sutcliffe efficiency (\nse{}), RMSE, \ubrmse{} and bias so that temporal
-association, error magnitude and mean-level offsets can be separated.
-\todo{Insert headline values and conclusion.}
+association, error magnitude and mean-level offsets can be separated. 
+
+Overall, the models transfer moderately to the independent validation sites, with
+the best result obtained for the Tarrawarra model 8 prediction which achieved an NSE of 0.07 
+and a Pearson r of 0.8. Untrained models consistently displayed wetness state compression
+error, where dry states where too wet and wet states too dry. Error was not significantly 
+stratified by terrain covariates or season. 
+
+Local calibration performed best when using a sensor selection strategy that mirrored 
+field knowledge of wet and dry parts of the landscape. Using a spatial and temporal block, 
+local calibration increased model performance from NSE around 0 to NSE ranging from 0.15 to 0.4. 
+Excluding the historical sites with no SMIPS anchor, the process model 8 responded more positively
+to local calibration than the statistical model 6. 
 
 \medskip
 \noindent\textbf{Keywords:} soil moisture; dense validation; downscaling;
@@ -295,11 +306,11 @@ each model is represented only by a table of support/date predictions and
 associated model-agnostic covariate strata.  This allows \modelSix{} and \modelEight{} to be
 compared without relying on either model's internal representation.
 
-\caution{For Tarrawarra and Nerrigundah, the current \modelSix{} prediction
+For Tarrawarra and Nerrigundah, the current \modelSix{} prediction
 tables have a \smips{}-zero/coarse-anchor caveat because historical SMIPS
-coverage was unavailable or returned zero-valued inputs for the model runs.
-Do not interpret their \modelSix{} skill as normal operational model6 results
-unless this is resolved or explicitly framed as a coarse-anchor ablation.}
+coverage was unavailable. Thus interpretation of \modelSix{} skill at these sites 
+is limited to model covariate stratified error and temporal dynamics rather than
+absolute error. 
 
 \section{Model-agnostic validation protocol}\label{sec:protocol}
 
@@ -366,7 +377,7 @@ relationship rather than memorising a point or date.
 
 \section{Stage 1: independent dense-point validation}\label{sec:stage1}
 
-Before interpreting scalar validation metrics, it is useful to see examples of
+Before interpreting validation metrics, it is useful to see examples of
 the gridded objects being scored.
 Figures~\ref{fig:esdale-dry-wet}--\ref{fig:llara-gridded} show observed dry and wet
 conditions where gridded products are already staged for the report.  MRI is
@@ -374,7 +385,11 @@ retained as a sparse continuous-probe validation in this draft, so it is shown
 through the DEM context map and time-series diagnostics rather than a gridded
 wet/dry map panel.  These panels are intended as a visual orientation to the map
 products; all scores below are calculated from matched validation supports
-rather than from visual inspection.
+rather than from visual inspection. 
+
+Notably, however, visual inspection suggests that model 8 has a more pronounced 
+terrain distribution of water, more closely resembling the TWI than model 6 outputs. 
+
 
 \begin{figure}[htbp]
 \centering
@@ -398,8 +413,8 @@ support.  Columns show the historical coarse estimate, \modelSix{} and
 \modelEight{}.  Mean predicted soil moisture across aggregated validation
 supports was 21.7\,\% and 23.4\,\% on the dry date, and 23.6\,\% and 31.6\,\%
 on the wet date, for \modelSix{} and \modelEight{} respectively.  \caution{The
-historical \smips{} input is affected by the zero-valued coarse-anchor caveat
-for this run.}}
+historical \smips{} input is affected by the zero-valued coarse-anchor caveat.}}
+
 \label{fig:tarrawarra-dry-wet}
 \end{figure}
 
@@ -451,10 +466,13 @@ questions.}
 The headline result is that validation-site transfer remains modest at this
 scale, matching closely to the unseen site cross validation results from the companion paper.
 Across the five retained datasets, pooled \nse{} is near zero for most
-site/model combinations despite positive Pearson correlations, meaning that
-the models often track some spatial or temporal ordering without yet
-reproducing the full observed magnitude and offset.  Esdale and Nerrigundah
-have the lowest RMSE, approximately 6--6.5 volumetric percentage points, but
+site/model combinations, however the Pearson correlations are consistently moderate, 
+ranging from 0.237 to 0.853, with the exception of Nerrigundah which has very low variability
+across the time period. Therefore models often track some spatial or temporal ordering without
+reproducing the level offset; a modelling challenge noted as being possibly due to 
+sensor-level measurement error and thus challenging to resolve (Adeel Ansari, 2026).
+
+Esdale and Nerrigundah have the lowest RMSE, approximately 6--6.5 volumetric percentage points, but
 Nerrigundah has weak correlation for both models.  Tarrawarra shows the clearest
 advantage for \modelEight{} after grid-cell support aggregation, while Llara
 and MRI show stronger temporal association for \modelEight{} but only modest
@@ -502,8 +520,10 @@ MRI & \modelEight{} & 29046 & 0.024 & 0.600 & 9.882 & 8.157
 \subsection{Predicted and observed time series}\label{sec:stage1-timeseries}
 
 Spatially averaged time series provide a diagnostic of seasonal tracking and
-mean-level bias.  They are not a substitute for support-level scoring, but they
-make temporal drift and wet/dry compression visually apparent.
+mean-level bias.  Alongside support level scoring, they
+make temporal drift and wet/dry compression visually apparent. Visually, the model outputs match the observed dynamics well. The predicted time series
+is generally compressed compared to the observed time series, but the predicted 
+direction of change is generally correct. 
 
 \begin{figure}[htbp]
 \centering
@@ -515,12 +535,14 @@ readable across the long probe record.}
 \label{fig:timeseries}
 \end{figure}
 
+\FloatBarrier
+
 \subsection{Seasonal and wetness-state bias}\label{sec:stage1-seasonal}
 
 The dense validation should emphasise seasonal and wetness-state bias because
 a model can have acceptable pooled error while systematically overpredicting
 dry states or underpredicting wet states.  This is particularly relevant to
-trafficability, drought stress and paddock management decisions.
+drought stress and paddock management decisions.
 
 Seasonal residuals show that mean bias is not stable through time
 (Fig.~\ref{fig:seasonal-bias}).  Esdale is limited to autumn--winter, where
@@ -632,27 +654,38 @@ absolute site environments differ.}
 \label{fig:pca-static-site-rmse}
 \end{figure}
 
-\subsection{Spatial clustering of prediction quality}
-\label{sec:stage1-spatial}
+Support-level overlap metrics provide a direct companion to the PCA diagnostic
+(Table~\ref{tab:model-failure-overlap}).  For each site, RMSE and bias were
+calculated separately for \modelSix{} and \modelEight{} at each validation
+support after pooling over available dates.  The correlations in
+Table~\ref{tab:model-failure-overlap} therefore ask whether the supports that
+are difficult for one model are also difficult for the other.  Positive
+correlations at every site indicate that the two models tend to perform poorly
+at broadly similar supports; the clearest differences between models are in
+error magnitude and bias rather than in wholly distinct spatial failure
+locations.
 
-Prediction-quality maps test whether poor performance is spatially organised.
-For publication, show support-level maps of \nse{}, Pearson $\pearsonr$, RMSE,
-\ubrmse{} and bias where sample size permits, plus a paired model-advantage map
-where useful.  Interpolated quality surfaces can aid visual diagnosis but
-should be labelled as diagnostic interpolation, not model output.
-
-\begin{figure}[htbp]
+\begin{table}[htbp]
 \centering
-\includegraphics[width=0.32\textwidth]{tarrawarra_model8_process_nse_idw_surface.png}
-\includegraphics[width=0.32\textwidth]{tarrawarra_model8_process_rmse_idw_surface.png}
-\includegraphics[width=0.32\textwidth]{tarrawarra_model8_process_bias_idw_surface.png}
-\caption{Example spatial prediction-quality surfaces for Tarrawarra
-\modelEight{}.  These are diagnostic interpolations of validation metrics at
-aggregated model-grid-cell support, not gridded model predictions.  \todo{Replace
-or extend with a final multi-site figure that uses consistent colour scales and
-includes paired model-advantage maps.}}
-\label{fig:quality-surfaces}
-\end{figure}
+\small
+\caption{Support-level model-failure overlap by site.  RMSE and bias
+correlations compare \modelSix{} and \modelEight{} across validation supports
+within each site.  Higher positive values indicate that the two models tend to
+have high error or similar signed bias at the same supports.}
+\label{tab:model-failure-overlap}
+\begin{tabular}{lrrr}
+\toprule
+Site & Supports & RMSE correlation & Bias correlation \\
+\midrule
+Esdale & 77 & 0.476 & 0.858 \\
+Llara & 32 & 0.796 & 0.950 \\
+MRI & 18 & 0.986 & 0.990 \\
+Nerrigundah & 128 & 0.525 & 0.986 \\
+Tarrawarra & 169 & 0.897 & 0.873 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 \FloatBarrier
 
@@ -683,7 +716,7 @@ The current calibration layers are:
 \item \textbf{Seasonal offset:} separate residual offsets by season where
   enough dates exist.
 \item \textbf{Affine correction:} local linear rescaling of prediction level.
-\item \textbf{Residual ridge layer:} residual model using selected model-agnostic covariate
+\item \textbf{Residual ridge layer:} residual model using selected model-agnostic
   covariates.
 \end{enumerate}
 
@@ -691,9 +724,27 @@ Point budgets are three, five, ten, 25\,\%, 50\,\% and all eligible local
 calibration points.  Validation is performed on held-out points and dates, with
 the strict spatial+temporal block treated as the primary transfer estimate.
 
-\todo{State exactly which selection strategies are retained in the final
-protocol.  Current set: random, landscape wet/dry prior, global-prediction
-extremes, and the field-knowledge wet/dry proxy upper bound.}
+The final protocol retains four point-selection strategies, but assigns them
+different evidentiary roles.  \texttt{random} selects eligible calibration
+supports without using landscape or model information and is retained as a
+conservative baseline comparator.  \texttt{landscape\_wetdry\_prior} selects
+alternating wet and dry extremes from a model-agnostic landscape wetness score
+derived from terrain, soil, coarse soil-moisture anchor and exposure/elevation
+covariates.  It represents the kind of deployable prior a landholder or analyst
+could construct before collecting local soil-moisture measurements.
+\texttt{global\_prediction\_extremes} selects alternating extremes of the
+uncalibrated model prediction mean.  This is also deployable at an unseen site,
+but it lets the base model identify where it expects the wettest and driest
+supports to occur.  Finally, \texttt{field\_knowledge\_wetdry\_proxy} selects
+alternating extremes of the observed chronic wet/dry ranking.  Because this
+ranking is calculated from the validation observations themselves, it is not a
+blind deployment strategy.  It is retained only as an optimistic upper-bound
+proxy for unusually accurate field knowledge or a preliminary dense survey, and
+is excluded from the main learning-curve figures and final minimum-information
+budget table.  The main Stage~2 inference therefore focuses on the two
+deployable non-random strategies, \texttt{landscape\_wetdry\_prior} and
+\texttt{global\_prediction\_extremes}; the random and observed wet/dry proxy
+strategies are kept as context and sensitivity checks.
 
 \subsection{Learning curves}\label{sec:stage2-learning}
 
@@ -849,12 +900,34 @@ regional/station transfer; dense validation reveals whether the 30\,m product
 has meaningful within-site spatial structure and whether residuals organise by
 terrain, season and wetness state.}
 
+The models developed in the companion paper are validated at regional scale with sites 
+represented by a single sensor placement. This data structure is valuable for model building
+as it allows a broad range of environmental gradients to be included in the training process
+without over representing a single densely sampled site. The limitation of this training
+protocol is that within site spatial variability is learnt from regional scale variability.
+The goal of this paper is to evaluate how relationships learnt from regional scale transfer to 
+within site spatial and seasonal accuracy. 
+
+We used summaries of seasonal and wetness state bias, 
+as well as decomposed support-level terrain-stratified error using PCA to identify whether the models
+sufficiently capture temporal dynamics as well as spatial organisation of local soil moisture. 
+Broadly, both models suffer from a compression problem where the wettest and driest deciles are compressed
+towards the mean. Seasonal analysis also demonstrated that residuals are not stable through time. 
+In terms of within-site error associated with particular topographic and soil positions, e.g. ridges and gullies, 
+sandy and clayey, there was no clear clustering of high residuals in the feature space between either models. 
+
+
 \subsection{Model complementarity at paddock scale}
 \label{sec:model-complementarity}
 
 \todo{Discuss whether \modelSix{} and \modelEight{} fail in the same places.
 Use paired comparisons and maps.  Avoid a single global winner unless the
 paired evidence is strong and caveats are resolved.}
+
+When RMSE and bias are evaluated within sites and compared between models at paired support 
+points both models fail in the same ways. No site had a negative correlation between support-level
+RMSE or bias, suggesting that the models cannot offer complementarity at the within-site level. 
+
 
 \subsection{Implications for local deployment}
 \label{sec:deployment}
@@ -863,12 +936,33 @@ paired evidence is strong and caveats are resolved.}
 separate adaptation layer placed on top of a national/global model, not as
 leakage into independent validation.}
 
+The 30m soil moisture model developed in the companion paper and independently validated 
+here is intended to by used by land owners and managers who are 
+interested in fine scale soil moisture mapping. While the 'global' model performs moderately
+at unseen sites, managers can choose to implement on ground soil moisture sensors to improve
+model performance at their site. This local calibration can be seen as a site-specific adapatation
+layer rather than a retraining of the base model. The adaptation layers are residual offsets applied 
+to the model prediction. 
+
+The analyses in the first stage of this paper help to inform 
+where sensor deployment can yield the greatest benefit for local model calibration. Overall, 
+while the models do not fail in any particular part of the terrain space, they do struggle to predict
+wetness extremes. Thus, local calibration benefits most from deployment strategies that target
+wetness extremes. This can be estimated in two ways to guide deployment: using the global model
+to predict over the property then characterise which pixels are the wettest and driest, or using 
+terrain and soil covariates to define which areas are most likely to be wet and dry given their 
+topographic position and soil water holding capacity. 
+
+
 \subsection{Future public training and validation data}
 \label{sec:future-data}
 
 \todo{Discuss likely value of additional public dense datasets, sensor
 networks, campaign data and remote/proximal sensing products.  Separate data
 that improve model training from data that improve independent validation.}
+
+- talk about how this evaluation is still limited in scope to south eastern australia. 
+
 
 \section{Limitations}\label{sec:limitations}
 
